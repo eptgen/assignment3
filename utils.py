@@ -136,7 +136,7 @@ def render_gif(renderer, model, num_povs, device):
     rends = []
     for i in range(num_povs):
         theta = 360 * i * (1 / num_povs)
-        R, T = look_at_view_transform(dist = 100., azim = theta)
+        R, T = look_at_view_transform(dist = 15., azim = theta)
         cameras = FoVPerspectiveCameras(
             R=R, T=T, fov=60, device = device
         )
