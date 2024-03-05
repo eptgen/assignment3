@@ -34,6 +34,7 @@ from dataset import (
     get_nerf_datasets,
     trivial_collate,
 )
+from utils import render_cloud
 
 
 # Model class containing:
@@ -98,18 +99,21 @@ def render_images(
 
         # TODO (Q1.3): Visualize xy grid using vis_grid
         if cam_idx == 0 and file_prefix == '':
-            pass
+            all_images.append(vis_grid(xy_grid, image_size))
 
         # TODO (Q1.3): Visualize rays using vis_rays
         if cam_idx == 0 and file_prefix == '':
-            pass
+            all_images.append(vis_rays(ray_bundle, image_size))
         
         # TODO (Q1.4): Implement point sampling along rays in sampler.py
-        pass
+        ray_bundle = model.sampler(ray_bundle)
 
         # TODO (Q1.4): Visualize sample points as point cloud
         if cam_idx == 0 and file_prefix == '':
-            pass
+            pts = ray_bundle.sample_points
+            all_images.append(render_cloud(torch.reshape(pts, (pts.shape[0] * pts.shape[1], 3)), False)) # shape change: (H*W, n_points, 3) => (H*W*n_points, 3)
+            
+        return all_images
 
         # TODO (Q1.5): Implement rendering in renderer.py
         out = model(ray_bundle)
@@ -141,14 +145,15 @@ def render(
 ):
     # Create model
     model = Model(cfg)
-    model = model.cuda(); model.eval()
+    model = model.eval() # TODO: change back # model.cuda(); model.eval()
 
     # Render spiral
     cameras = create_surround_cameras(3.0, n_poses=20)
     all_images = render_images(
         model, cameras, cfg.data.image_size
     )
-    imageio.mimsave('images/part_1.gif', [np.uint8(im * 255) for im in all_images])
+
+    imageio.mimsave('images/part_1.gif', [np.uint8(im * 255) for im in all_images], loop = 0, fps = 1)
 
 
 def train(
