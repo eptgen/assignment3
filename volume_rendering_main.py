@@ -152,7 +152,8 @@ def render(
     all_images = render_images(
         model, cameras, cfg.data.image_size
     )
-
+    
+    print("teh length", len(all_images))
     imageio.mimsave('images/part_1.gif', [np.uint8(im * 255) for im in all_images], loop = 0, fps = 1)
 
 
