@@ -132,15 +132,15 @@ def load_cow_mesh(path="data/cow_mesh.obj"):
     faces = faces.verts_idx
     return vertices, faces
     
-def render_gif(renderer, model, num_povs):
+def render_gif(renderer, model, num_povs, device):
     rends = []
     for i in range(num_povs):
         theta = 360 * i * (1 / num_povs)
         R, T = look_at_view_transform(dist = 2., azim = theta)
         cameras = FoVPerspectiveCameras(
-            R=R, T=T, fov=60
+            R=R, T=T, fov=60, device = device
         )
-        lights = PointLights(location=[[0, 0, -3]])
+        lights = PointLights(location=[[0, 0, -3]], device = device)
         rend = renderer(model, cameras=cameras, lights=lights)
         rends.append((rend.detach().cpu().numpy()[0, ..., :3] * 255).astype(np.uint8))
     return rends
@@ -170,21 +170,20 @@ def render_voxel(voxels, args):
     mesh.textures = TexturesVertex(mesh_textures.unsqueeze(0))
     return render_gif(renderer, mesh, args, 10)
 
-def render_one(renderer, model):
-    return render_gif(renderer, model, 1)[0]
+def render_one(renderer, model, device):
+    return render_gif(renderer, model, 1, device)[0]
 
-def render_cloud(points, output_gif):
-    color = torch.tensor([0.7, 0.7, 1])
-    renderer = get_points_renderer(image_size=256)
-    rgb = torch.ones_like(points) * color
+def render_cloud(points, output_gif, device):
+    color = torch.tensor([0.7, 0.7, 1], device = device)
+    renderer = get_points_renderer(image_size=256, device = device)
+    rgb = torch.ones_like(points, device = device) * color
     pc = Pointclouds(
         points=points.unsqueeze(0),
         features=rgb.unsqueeze(0),
-    )
-    lights = PointLights(location=[[0, 0, -3]])
+    ).to(device)
     
-    if output_gif: return render_gif(renderer, pc, 10)
-    return render_one(renderer, pc)
+    if output_gif: return render_gif(renderer, pc, 10, device)
+    return render_one(renderer, pc, device)
     
 def render_mesh(mesh, args):
     color = torch.tensor([0.7, 0.7, 1], device = args.device)
