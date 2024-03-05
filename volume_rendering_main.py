@@ -145,7 +145,7 @@ def render(
 ):
     # Create model
     model = Model(cfg)
-    model = model.eval() # TODO: change back # model.cuda(); model.eval()
+    model = model.cuda(); model.eval()
 
     # Render spiral
     cameras = create_surround_cameras(3.0, n_poses=20)
