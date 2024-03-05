@@ -89,8 +89,8 @@ def get_pixels_from_image(image_size, camera):
     W, H = image_size[0], image_size[1]
 
     # TODO (Q1.3): Generate pixel coordinates from [0, W] in x and [0, H] in y
-    x = torch.linspace(0, W, W)
-    y = torch.linspace(0, H, H)
+    x = torch.linspace(0, W, W, device = "cuda:0!")
+    y = torch.linspace(0, H, H, device = "cuda:0!")
 
     # TODO (Q1.3): Convert to the range [-1, 1] in both x and y
     x = x / (W / 2) - 1
