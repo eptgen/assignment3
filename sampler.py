@@ -28,7 +28,7 @@ class StratifiedRaysampler(torch.nn.Module):
         # TODO (Q1.4): Sample points from z values
         origins = ray_bundle.origins.unsqueeze(1) # shape: (H*W, 1, 3)
         unsqueezed_z = z_vals.unsqueeze(1) # shape: (n_points, 1)
-        unsqueezed_ray_bundle = ray_bundle.directions.unsqueeze(1) # shape: (H*W, 1, 3)
+        unsqueezed_ray_bundle = torch.nn.functional.normalize(ray_bundle.directions, dim = 1).unsqueeze(1) # shape: (H*W, 1, 3)
         sampled = unsqueezed_ray_bundle * unsqueezed_z # shape: (H*W, n_points, 3)
         # print("shapes", unsqueezed_z.shape, unsqueezed_ray_bundle.shape, sampled.shape, origins.shape)
         sample_points = sampled + origins # shape: (H*W, n_points, 3)
