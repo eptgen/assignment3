@@ -34,7 +34,7 @@ from dataset import (
     get_nerf_datasets,
     trivial_collate,
 )
-from utils import render_cloud
+from render_functions import render_points
 
 
 # Model class containing:
