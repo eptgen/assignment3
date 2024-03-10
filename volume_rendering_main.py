@@ -111,7 +111,7 @@ def render_images(
         # TODO (Q1.4): Visualize sample points as point cloud
         if cam_idx == 0 and file_prefix == '':
             pts = ray_bundle.sample_points
-            all_images.append(render_cloud(torch.reshape(pts, (pts.shape[0] * pts.shape[1], 3)), False, "cuda", camera)) # shape change: (H*W, n_points, 3) => (H*W*n_points, 3)
+            render_points('images/part_1_pc.png', torch.reshape(pts, (pts.shape[0] * pts.shape[1], 3))) # shape change: (H*W, n_points, 3) => (H*W*n_points, 3)
             
         return all_images
 

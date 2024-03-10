@@ -176,7 +176,7 @@ def render_one(renderer, model, device, camera = None):
     return render_gif(renderer, model, 1, device, camera)[0]
 
 def render_cloud(points, output_gif, device, camera = None):
-    color = torch.tensor([0.7, 0.7, 0.7], device = device)
+    color = torch.tensor([0.7, 0.7, 1.0], device = device)
     renderer = get_points_renderer(image_size=256, device = device)
     rgb = torch.ones_like(points, device = device) * color
     pc = Pointclouds(
