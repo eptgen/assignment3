@@ -188,7 +188,7 @@ def render_cloud(points, output_gif, device, camera = None):
     return render_one(renderer, pc, device, camera)
     
 def render_mesh(mesh, args):
-    color = torch.tensor([0.7, 0.7, 1], device = args.device)
+    color = torch.tensor([0.7, 0.7, 0.7], device = args.device)
     
     renderer = get_mesh_renderer(image_size=256)
     mesh_textures = torch.ones_like(mesh.verts_packed(), device = args.device)
