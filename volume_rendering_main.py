@@ -1,3 +1,4 @@
+from math import exp
 import os
 import warnings
 
@@ -63,6 +64,8 @@ class Model(torch.nn.Module):
         self.renderer = renderer_dict[cfg.renderer.type](
             cfg.renderer
         )
+        
+        self.weights = None
     
     def forward(
         self,
@@ -71,6 +74,7 @@ class Model(torch.nn.Module):
         # Call renderer with
         #  a) Implicit volume
         #  b) Sampling routine
+        implicit_out = self.implicit_fn(ray_bundle)
 
         return self.renderer(
             self.sampler,
@@ -112,8 +116,6 @@ def render_images(
         if cam_idx == 0 and file_prefix == '':
             pts = ray_bundle.sample_points
             render_points('images/part_1_pc.png', torch.reshape(pts, (1, pts.shape[0] * pts.shape[1], 3))) # shape change: (H*W, n_points, 3) => (H*W*n_points, 3)
-            
-        return all_images
 
         # TODO (Q1.5): Implement rendering in renderer.py
         out = model(ray_bundle)
