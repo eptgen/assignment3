@@ -40,7 +40,7 @@ def get_device():
     return device
 
 def get_points_renderer(
-    image_size=512, device=None, radius=0.01, background_color=(1, 1, 1)
+    image_size=512, device=None, radius=0.01, background_color=(0, 0, 0)
 ):
     """
     Returns a Pytorch3D renderer for point clouds.
