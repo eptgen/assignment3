@@ -23,13 +23,15 @@ class VolumeRenderer(torch.nn.Module):
         eps: float = 1e-10
     ):
         print("rays/deltas shape", rays_density.shape, deltas.shape)
-        num_weights = deltas.shape[0]
-        weights = torch.zeros(num_weights)
-        T = 1
-        last_seg = 0
+        num_weights = deltas.shape[1]
+        batch_size = deltas.shape[0]
+        weights = torch.zeros(batch_size, num_weights)
+        T = torch.ones(batch_size)
+        rays_density_sq = rays_density.squeeze()
+        deltas_sq = deltas.squeeze()
         for i in range(num_weights):
-            weights[i] = T * (1 - torch.exp(-rays_density[i] * deltas[i]))
-            T *= 1 - torch.exp(-rays_density[i] * deltas[i])
+            weights[:, i] = T * (1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i]))
+            T *= 1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i])
 
         return weights
     
