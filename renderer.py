@@ -25,8 +25,8 @@ class VolumeRenderer(torch.nn.Module):
         print("rays/deltas shape", rays_density.shape, deltas.shape)
         num_weights = deltas.shape[1]
         batch_size = deltas.shape[0]
-        weights = torch.zeros(batch_size, num_weights)
-        T = torch.ones(batch_size)
+        weights = torch.zeros(batch_size, num_weights, device = "cuda")
+        T = torch.ones(batch_size, device = "cuda")
         rays_density_sq = rays_density.squeeze()
         deltas_sq = deltas.squeeze()
         for i in range(num_weights):
