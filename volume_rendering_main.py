@@ -103,11 +103,11 @@ def render_images(
 
         # TODO (Q1.3): Visualize xy grid using vis_grid
         if cam_idx == 0 and file_prefix == '':
-            all_images.append(vis_grid(xy_grid, image_size))
+            pass # all_images.append(vis_grid(xy_grid, image_size))
 
         # TODO (Q1.3): Visualize rays using vis_rays
         if cam_idx == 0 and file_prefix == '':
-            all_images.append(vis_rays(ray_bundle, image_size))
+            pass # all_images.append(vis_rays(ray_bundle, image_size))
         
         # TODO (Q1.4): Implement point sampling along rays in sampler.py
         ray_bundle = model.sampler(ray_bundle)
@@ -131,7 +131,7 @@ def render_images(
         # TODO (Q1.5): Visualize depth
         if cam_idx == 2 and file_prefix == '':
             depths = out['depth'] / torch.max(out['depth'])
-            plt.imsave("images/depth_map.png", depths)
+            plt.imsave("images/depth_map.png", depths.cpu())
 
         # Save
         if save:

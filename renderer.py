@@ -40,7 +40,7 @@ class VolumeRenderer(torch.nn.Module):
         weights: torch.Tensor,
         rays_feature: torch.Tensor
     ):
-        print("weights/rays shape", weights.shape, rays_feature.shape)
+        # print("weights/rays shape", weights.shape, rays_feature.shape)
         return torch.sum(weights.unsqueeze(-1) * rays_feature.reshape(weights.shape[0], weights.shape[1], -1), dim = 1)
 
     def forward(
