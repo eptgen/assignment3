@@ -30,7 +30,7 @@ class VolumeRenderer(torch.nn.Module):
         rays_density_sq = rays_density.squeeze()
         deltas_sq = deltas.squeeze()
         print("rays densities")
-        print(rays_density_sq)
+        print(torch.max(rays_density_sq))
         print("deltas")
         print(deltas_sq)
         for i in range(num_weights):
