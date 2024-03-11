@@ -86,6 +86,7 @@ class VolumeRenderer(torch.nn.Module):
             feature = self._aggregate(weights, feature)
 
             # TODO (1.5): Render depth map
+            print("sample_lengths shape", cur_ray_bundle.sample_lengths.shape)
             depth = self._aggregate(weights, cur_ray_bundle.sample_lengths)
 
             # Return
