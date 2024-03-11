@@ -32,6 +32,7 @@ class VolumeRenderer(torch.nn.Module):
         for i in range(num_weights):
             weights[:, i] = T * (1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i]))
             T *= 1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i])
+            print(T)
 
         return weights
     
