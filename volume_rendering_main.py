@@ -158,7 +158,7 @@ def render(
     
     # print("teh length", len(all_images))
     # print(all_images[2])
-    imageio.mimsave('images/part_1.gif', [np.uint8(im * 255) for im in all_images], loop = 0, fps = 1)
+    imageio.mimsave('images/part_1_agaim.gif', [np.uint8(im * 255) for im in all_images], loop = 0, fps = 1)
 
 
 def train(
