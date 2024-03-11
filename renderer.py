@@ -32,7 +32,7 @@ class VolumeRenderer(torch.nn.Module):
         for i in range(num_weights):
             weights[:, i] = T * (1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i]))
             T *= 1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i])
-            print(T)
+            if i == 0: print(T)
 
         return weights
     
@@ -87,7 +87,7 @@ class VolumeRenderer(torch.nn.Module):
             feature = self._aggregate(weights, feature)
 
             # TODO (1.5): Render depth map
-            print("sample_lengths shape", cur_ray_bundle.sample_lengths.shape)
+            # print("sample_lengths shape", cur_ray_bundle.sample_lengths.shape)
             depth = self._aggregate(weights, cur_ray_bundle.sample_lengths)
 
             # Return
