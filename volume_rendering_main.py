@@ -131,6 +131,7 @@ def render_images(
         # TODO (Q1.5): Visualize depth
         if cam_idx == 2 and file_prefix == '':
             depths = out['depth'] / torch.max(out['depth'])
+            print("depth shape", depths.shape)
             plt.imsave("images/depth_map.png", depths.detach().cpu().numpy())
 
         # Save
@@ -158,7 +159,7 @@ def render(
     
     # print("teh length", len(all_images))
     # print(all_images[2])
-    imageio.mimsave('images/part_1_agaim.gif', [np.uint8(im * 255) for im in all_images], loop = 0, fps = 1)
+    imageio.mimsave('images/part_1.gif', [np.uint8(im * 255) for im in all_images], loop = 0, fps = 1)
 
 
 def train(
