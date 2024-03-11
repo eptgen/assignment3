@@ -22,7 +22,7 @@ class VolumeRenderer(torch.nn.Module):
         rays_density: torch.Tensor,
         eps: float = 1e-10
     ):
-        print("rays/deltas shape", rays_density.shape, deltas.shape)
+        # print("rays/deltas shape", rays_density.shape, deltas.shape)
         num_weights = deltas.shape[1]
         batch_size = deltas.shape[0]
         weights = torch.zeros(batch_size, num_weights, device = "cuda")
@@ -40,6 +40,7 @@ class VolumeRenderer(torch.nn.Module):
         weights: torch.Tensor,
         rays_feature: torch.Tensor
     ):
+        print("weights/rays shape", weights.shape, rays_feature.shape)
         return torch.sum(weights * rays_feature, dim = -1)
 
     def forward(
