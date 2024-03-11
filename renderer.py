@@ -1,4 +1,3 @@
-from math import exp
 import torch
 
 from typing import List, Optional, Tuple
@@ -28,8 +27,8 @@ class VolumeRenderer(torch.nn.Module):
         T = 1
         last_seg = 0
         for i in range(num_weights):
-            weights[i] = T * (1 - exp(-rays_density[i] * deltas[i]))
-            T *= 1 - exp(-rays_density[i] * deltas[i])
+            weights[i] = T * (1 - torch.exp(-rays_density[i] * deltas[i]))
+            T *= 1 - torch.exp(-rays_density[i] * deltas[i])
 
         return weights
     
@@ -38,11 +37,7 @@ class VolumeRenderer(torch.nn.Module):
         weights: torch.Tensor,
         rays_feature: torch.Tensor
     ):
-        num_weights = weights.shape[0]
-        res = torch.zeros(rays_feature.shape[-1])
-        for i in range(num_weights):
-            res += weights[i] * rays_feature[i]
-        return res
+        return torch.sum(weights * rays_feature, dim = -1)
 
     def forward(
         self,
