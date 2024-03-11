@@ -131,7 +131,7 @@ def render_images(
         # TODO (Q1.5): Visualize depth
         if cam_idx == 2 and file_prefix == '':
             depths = out['depth'] / torch.max(out['depth'])
-            depths = depths.reshape(image_size)
+            depths = depths.reshape(image_size[1], image_size[0])
             plt.imsave("images/depth_map.png", depths.detach().cpu().numpy())
 
         # Save
