@@ -37,7 +37,7 @@ class StratifiedRaysampler(torch.nn.Module):
         # print("sample_points shape", sample_points.shape)
         return ray_bundle._replace(
             sample_points=sample_points,
-            sample_lengths=z_vals.unsqueeze(1) * torch.ones_like(sample_points[..., :1]),
+            sample_lengths=unsqueezed_z * torch.ones_like(sample_points[..., :1]),
         )
 
 
