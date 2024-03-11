@@ -22,6 +22,7 @@ class VolumeRenderer(torch.nn.Module):
         rays_density: torch.Tensor,
         eps: float = 1e-10
     ):
+        print("rays/deltas shape", rays_density.shape, deltas.shape)
         num_weights = deltas.shape[0]
         weights = torch.zeros(num_weights)
         T = 1
