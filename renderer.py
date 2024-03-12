@@ -34,7 +34,9 @@ class VolumeRenderer(torch.nn.Module):
         # print("deltas")
         # print(deltas_sq)
         for i in range(num_weights):
-            weights[:, i] = T * (1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i]))
+            prod = -rays_density_sq[:, i] * deltas_sq[:, i]
+            print("prod sum", torch.sum(prod))
+            weights[:, i] = T * (1 - torch.exp(prod))
             T *= 1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i])
 
         return weights
@@ -87,7 +89,7 @@ class VolumeRenderer(torch.nn.Module):
                 deltas.view(-1, n_pts, 1),
                 density.view(-1, n_pts, 1)
             )
-            print("weights sum", torch.sum(weights))
+            # print("weights sum", torch.sum(weights))
 
             # TODO (1.5): Render (color) features using weights
             feature = self._aggregate(weights, feature)
