@@ -214,7 +214,7 @@ def train(
 
             # TODO (Q2.2): Calculate loss
             # print("shapes", rgb_gt.shape, out["feature"].shape)
-            loss = torch.nn.functional.mse_loss(out["feature"], rbg_gt)
+            loss = torch.nn.functional.mse_loss(out["feature"], rgb_gt)
 
             # Backprop
             optimizer.zero_grad()
