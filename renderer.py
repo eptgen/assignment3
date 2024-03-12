@@ -69,6 +69,7 @@ class VolumeRenderer(torch.nn.Module):
             implicit_output = implicit_fn(cur_ray_bundle)
             density = implicit_output['density']
             feature = implicit_output['feature']
+            print("density", density)
 
             # Compute length of each ray segment
             depth_values = cur_ray_bundle.sample_lengths[..., 0]
