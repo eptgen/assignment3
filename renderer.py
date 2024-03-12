@@ -86,7 +86,8 @@ class VolumeRenderer(torch.nn.Module):
             weights = self._compute_weights(
                 deltas.view(-1, n_pts, 1),
                 density.view(-1, n_pts, 1)
-            ) 
+            )
+            print("weights sum", torch.sum(weights))
 
             # TODO (1.5): Render (color) features using weights
             feature = self._aggregate(weights, feature)
