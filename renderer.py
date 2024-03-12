@@ -29,10 +29,10 @@ class VolumeRenderer(torch.nn.Module):
         T = torch.ones(batch_size, device = "cuda")
         rays_density_sq = rays_density.squeeze()
         deltas_sq = deltas.squeeze()
-        print("rays densities")
-        print(torch.max(rays_density_sq))
-        print("deltas")
-        print(deltas_sq)
+        # print("rays densities")
+        # print(torch.max(rays_density_sq))
+        # print("deltas")
+        # print(deltas_sq)
         for i in range(num_weights):
             weights[:, i] = T * (1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i]))
             T *= 1 - torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i])
@@ -69,7 +69,8 @@ class VolumeRenderer(torch.nn.Module):
             implicit_output = implicit_fn(cur_ray_bundle)
             density = implicit_output['density']
             feature = implicit_output['feature']
-            print("density", density)
+            print("density", density.shape)
+            print("density sum", torch.sum(density.shape))
 
             # Compute length of each ray segment
             depth_values = cur_ray_bundle.sample_lengths[..., 0]
