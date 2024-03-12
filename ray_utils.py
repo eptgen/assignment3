@@ -85,6 +85,7 @@ def sample_images_at_xy(
 
 
 # Generate pixel coordinates from in NDC space (from [-1, 1])
+# Shape: (H*W, 2)
 def get_pixels_from_image(image_size, camera):
     W, H = image_size[0], image_size[1]
 
@@ -106,14 +107,15 @@ def get_pixels_from_image(image_size, camera):
 
 
 # Random subsampling of pixels from an image
+# Shape: (n_pixels, 2)
 def get_random_pixels_from_image(n_pixels, image_size, camera):
-    xy_grid = get_pixels_from_image(image_size, camera)
+    xy_grid = get_pixels_from_image(image_size, camera) # (H*W, 2)
     
     # TODO (Q2.1): Random subsampling of pixel coordinaters
-    pass
+    xy_grid_sub = xy_grid[torch.randint(0, xy_grid.shape[0], (n_pixels))] # (n_pixels, 2)
 
     # Return
-    return xy_grid_sub.reshape(-1, 2)[:n_pixels]
+    return xy_grid_sub # .reshape(-1, 2)[:n_pixels]
 
 
 # Get rays from pixel values

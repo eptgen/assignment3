@@ -213,6 +213,7 @@ def train(
             out = model(ray_bundle)
 
             # TODO (Q2.2): Calculate loss
+            print("shape", rgb_gt.shape)
             loss = None
 
             # Backprop
