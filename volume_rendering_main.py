@@ -207,13 +207,13 @@ def train(
             # Sample rays
             xy_grid = get_random_pixels_from_image(cfg.training.batch_size, image_size, camera) # TODO (Q2.1): implement in ray_utils.py
             ray_bundle = get_rays_from_pixels(xy_grid, image_size, camera)
-            rgb_gt = sample_images_at_xy(image, xy_grid)
+            rgb_gt = sample_images_at_xy(image, xy_grid) # (B, 3)
 
             # Run model forward
             out = model(ray_bundle)
 
             # TODO (Q2.2): Calculate loss
-            print("shape", rgb_gt.shape)
+            print("shapes", rgb_gt.shape, ray_bundle.shape)
             loss = None
 
             # Backprop
