@@ -23,23 +23,29 @@ class VolumeRenderer(torch.nn.Module):
         eps: float = 1e-10
     ):
         # print("rays/deltas shape", rays_density.shape, deltas.shape)
+        """
         num_weights = deltas.shape[1]
         batch_size = deltas.shape[0]
         weights = torch.zeros(batch_size, num_weights, device = "cuda")
         T = torch.ones(batch_size, device = "cuda")
         rays_density_sq = rays_density.squeeze()
         deltas_sq = deltas.squeeze()
-        # print("rays densities")
-        # print(torch.max(rays_density_sq))
-        # print("deltas")
-        # print(deltas_sq)
         for i in range(num_weights):
             prod = -rays_density_sq[:, i] * deltas_sq[:, i]
             # print("prod sum", torch.sum(prod))
             weights[:, i] = T * (1 - torch.exp(prod))
             T *= torch.exp(-rays_density_sq[:, i] * deltas_sq[:, i])
+        """
+        B = deltas.shape[0]
+        n_points = deltas.shape[1]
+        rays_density_sq = rays_density.squeeze() # (B, n_points)
+        deltas_sq = deltas.squeeze() # (B, n_points)
+        prods = -rays_density_sq * deltas_sq # (B, n_points)
+        exp_prods = torch.exp(prods) # (B, n_points)
+        one_minus_exp_prods = 1 - exp_prods # (B, n_points)
+        T = torch.cumprod(torch.cat((torch.ones(B, device = "cuda"), exp_prods), dim = 0)[:-1], dim = 1) # (B, n_points)
 
-        return weights
+        return T * one_minus_exp_prods # (B, n_points)
     
     def _aggregate(
         self,
