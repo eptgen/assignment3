@@ -43,7 +43,7 @@ class VolumeRenderer(torch.nn.Module):
         prods = -rays_density_sq * deltas_sq # (B, n_points)
         exp_prods = torch.exp(prods) # (B, n_points)
         one_minus_exp_prods = 1 - exp_prods # (B, n_points)
-        T = torch.cumprod(torch.cat((torch.ones(B, device = "cuda").unsqueeze(1), exp_prods), dim = 1)[:-1], dim = 1) # (B, n_points)
+        T = torch.cumprod(torch.cat((torch.ones(B, device = "cuda").unsqueeze(1), exp_prods), dim = 1)[:, :-1], dim = 1) # (B, n_points)
 
         return T * one_minus_exp_prods # (B, n_points)
     
