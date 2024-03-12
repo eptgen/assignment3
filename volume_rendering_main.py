@@ -210,11 +210,11 @@ def train(
             rgb_gt = sample_images_at_xy(image, xy_grid) # (B, 3)
 
             # Run model forward
-            out = model(ray_bundle)
+            out = model(ray_bundle) # out["feature"].shape == (B, 3)
 
             # TODO (Q2.2): Calculate loss
-            print("shapes", rgb_gt.shape, out["feature"].shape)
-            loss = None
+            # print("shapes", rgb_gt.shape, out["feature"].shape)
+            loss = torch.nn.functional.mse_loss(out["feature"], rbg_gt)
 
             # Backprop
             optimizer.zero_grad()
