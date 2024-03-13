@@ -312,7 +312,7 @@ class NeuralRadianceField(torch.nn.Module):
         self.hidden_8 = nn.Linear(256, 256)
         self.relu8 = nn.ReLU()
         self.hidden_9 = nn.Linear(256, 256)
-        self.relu9 = nn.ReLU
+        self.relu9 = nn.ReLU()
         self.to_density = nn.Linear(256, 1)
         self.relu10 = nn.ReLU()
         
