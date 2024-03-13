@@ -301,20 +301,21 @@ class NeuralRadianceField(torch.nn.Module):
         # print("shapes pts/dirs", embedding_dim_xyz, embedding_dim_dir)
         
         self.xyz_hidden = nn.Linear(embedding_dim_xyz, cfg.n_hidden_neurons_xyz)
-        self.dir_hidden = nn.Linear(embedding_dim_dir, cfg.n_hidden_neurons_dir)
-        total_hidden = cfg.n_hidden_neurons_xyz + cfg.n_hidden_neurons_dir
-        
-        self.to_color = nn.Linear(total_hidden, 3)
-        self.sig = nn.Sigmoid()
-        self.to_density = nn.Linear(total_hidden, 1)
+        self.to_density = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
         self.relu = nn.ReLU()
+        self.to_feature_vector = nn.Linear(cfg.n_hidden_neurons_xyz, 256)
+        total_feature = 256 + embedding_dim_dir
+        
+        self.dir_hidden = nn.Linear(total_feature, cfg.n_hidden_neurons_dir)
+        
+        self.to_color = nn.Linear(cfg.n_hidden_neurons_dir, 3)
+        self.sig = nn.Sigmoid()
         
         # view independent
         self.to_color_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 3)
         self.to_density_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
 
     def forward(self, ray_bundle):
-        """
         # view dependent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         n_points = pts.shape[1]
@@ -323,14 +324,16 @@ class NeuralRadianceField(torch.nn.Module):
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
         dirs = self.harmonic_embedding_dir(dirs) # (B, hedir_output_dim)
         pts = self.xyz_hidden(pts) # (B, hidden_xyz)
-        dirs = self.dir_hidden(dirs) # (B, hidden_dir)
-        both = torch.cat((pts, dirs), dim = 1) # (B, hidden_xyz + hidden_dir)
+        sigma = self.to_density(pts) # (B, 1)
+        sigma = self.relu(sigma) # (B, 1)
+        
+        features = self.to_feature_vector(pts) # (B, 256)
+        both = torch.cat((features, dirs), dim = 1) # (B, 256 + hedir_output_dim)
+        both = self.dir_hidden(both) # (B, hidden_dir)
         color = self.to_color(both) # (B, 3)
         color = self.sig(color) # (B, 3)
-        sigma = self.to_density(both) # (B, 1)
-        sigma = self.relu(sigma) # (B, 1)
-        """
         
+        """
         # view independent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
@@ -340,6 +343,7 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.sig(color)
         sigma = self.to_density_ind(pts) # (B, 1)
         sigma = self.relu(sigma)
+        """
         
         return {"feature": color, "density": sigma}
 
