@@ -66,7 +66,7 @@ class VolumeRenderer(torch.nn.Module):
         # Process the chunks of rays.
         chunk_outputs = []
         
-        print("B, chunk_size", B, self._chunk_size)
+        # print("B, chunk_size", B, self._chunk_size)
 
         for chunk_start in range(0, B, self._chunk_size):
             chunk_end = min(B, chunk_start+self._chunk_size)
@@ -80,7 +80,8 @@ class VolumeRenderer(torch.nn.Module):
             implicit_output = implicit_fn(cur_ray_bundle)
             density = implicit_output['density']
             feature = implicit_output['feature']
-            # print("density", density.shape)
+            print("density", density.shape)
+            print("feature", feature.shape)
             # print("density L0", torch.norm(density, p = 0))
 
             # Compute length of each ray segment
