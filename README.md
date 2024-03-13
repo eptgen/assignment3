@@ -3,3 +3,4 @@ In order to get the depth_map, run the command `python volume_rendering_main.py 
 
 To train the volumetric model, run the command `python volume_rendering_main.py --config-name=train_box`. The GIF and images will appear in the `images` directory, and the box center and side lengths will be outputted.
 
+To train the NeRF, run the command `python volume_rendering_main.py --config-name=nerf_lego`. The GIF will appear in the `image` directory.
