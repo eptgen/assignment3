@@ -373,7 +373,7 @@ class NeuralRadianceField(torch.nn.Module):
         features_nosigma = self.relu9(features_nosigma) # (B, 256)
         sigma = self.to_density(features) # (B, 1)
         sigma = self.relu10(sigma) # (B, 1)
-        features_nosigma = self.hidden_10(features_nosigma) # (B, 128)
+        features_nosigma = self.hidden_10_ind(features_nosigma) # (B, 128)
         features_nosigma = self.relu11(features_nosigma) # (B, 128)
         color = self.to_color(features_nosigma) # (B, 3)
         color = self.sig(color) # (B, 3)
