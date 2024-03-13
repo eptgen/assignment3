@@ -297,15 +297,32 @@ class NeuralRadianceField(torch.nn.Module):
 
         embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
         embedding_dim_dir = self.harmonic_embedding_dir.output_dim
-        print("shapes pts/dirs", embedding_dim_xyz, embedding_dim_dir)
+        # print("shapes pts/dirs", embedding_dim_xyz, embedding_dim_dir)
+        
+        self.xyz_hidden = nn.Linear(embedding_dim_xyz, cfg.n_hidden_neurons_xyz)
+        self.dir_hidden = nn.Linear(embedding_dim_dir, cfg.n_hidden_neurons_dir)
+        total_hidden = cfg.n_hidden_neurons_xyz + cfg.n_hidden_neurons_dir
+        
+        self.to_color = nn.Linear(total_hidden, 3)
+        self.sig = nn.Sigmoid()
+        self.to_density = nn.Linear(total_hidden, 3)
+        self.relu = nn.ReLU()
 
-        pass
     def forward(self, ray_bundle):
-        pts = ray_bundle.sample_points # (B, 3)
-        dirs = ray_bundle.directions # (B, 3)
-        pts = self.harmonic_embedding_xyz(pts)
-        dirs = self.harmonic_embedding_dir(dirs)
-        assert False
+        pts = ray_bundle.sample_points # (H*W, n_points, 3)
+        n_points = pts.shape[1]
+        pts = pts.reshape(-1, 3) # (B, 3)
+        dirs = (ray_bundle.directions.unsqueeze(1) * torch.ones(n_points, 1, device = "cuda")).reshape(-1, 3) # (B, 3)
+        pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
+        dirs = self.harmonic_embedding_dir(dirs) # (B, hedir_output_dim)
+        pts = self.xyz_hidden(pts) # (B, hidden_xyz)
+        dirs = self.dir_hidden(dirs) # (B, hidden_dir)
+        both = torch.cat((pts, dirs), dim = 1) # (B, hidden_xyz + hidden_dir)
+        color = self.to_color(both) # (B, 3)
+        color = self.sig(color) # (B, 3)
+        sigma = self.to_density(both) # (B, 3)
+        sigma = self.relu(sigma) # (B, 3)
+        return {"feature": color, "density": sigma}
 
 class NeuralSurface(torch.nn.Module):
     def __init__(

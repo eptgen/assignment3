@@ -311,6 +311,9 @@ def train_nerf(
         num_workers=0,
         collate_fn=trivial_collate,
     )
+    
+    renderer = renderer_dict["volume"](cfg.renderer)
+    sampler = sampler_dict[cfg.sampler.type](cfg.sampler)
 
     # Run the main training loop.
     for epoch in range(start_epoch, cfg.training.num_epochs):
@@ -331,10 +334,10 @@ def train_nerf(
             rgb_gt = sample_images_at_xy(image, xy_grid)
 
             # Run model forward
-            out = model(ray_bundle)
+            out = renderer(sampler, model, ray_bundle)
 
             # TODO (Q3.1): Calculate loss
-            loss = None
+            loss = torch.nn.functional.mse_loss(out["feature"], rgb_gt)
 
             # Take the training step.
             optimizer.zero_grad()
