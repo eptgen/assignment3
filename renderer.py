@@ -78,7 +78,7 @@ class VolumeRenderer(torch.nn.Module):
 
             # Call implicit function with sample points
             implicit_output = implicit_fn(cur_ray_bundle)
-            print(type(implicit_fn))
+            # print(type(implicit_fn))
             # print(implicit_output.keys())
             density = implicit_output['density']
             feature = implicit_output['feature']

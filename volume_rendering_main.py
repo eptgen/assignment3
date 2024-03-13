@@ -334,6 +334,7 @@ def train_nerf(
             rgb_gt = sample_images_at_xy(image, xy_grid)
 
             # Run model forward
+            print(type(model))
             out = renderer(sampler, model, ray_bundle)
 
             # TODO (Q3.1): Calculate loss
