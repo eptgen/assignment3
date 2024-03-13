@@ -294,28 +294,42 @@ class NeuralRadianceField(torch.nn.Module):
         super().__init__()
 
         self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
-        self.harmonic_embedding_dir = HarmonicEmbedding(3, cfg.n_harmonic_functions_dir)
-
         embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
+        self.hidden_1 = nn.Linear(embedding_dim_xyz, 256)
+        self.relu1 = nn.ReLU()
+        self.hidden_2 = nn.Linear(256, 256)
+        self.relu2 = nn.ReLU()
+        self.hidden_3 = nn.Linear(256, 256)
+        self.relu3 = nn.ReLU()
+        self.hidden_4 = nn.Linear(256, 256)
+        self.relu4 = nn.ReLU()
+        self.hidden_5 = nn.Linear(256, 256)
+        self.relu5 = nn.ReLU()
+        self.hidden_6 = nn.Linear(256 + embedding_dim_xyz, 256)
+        self.relu6 = nn.ReLU()
+        self.hidden_7 = nn.Linear(256, 256)
+        self.relu7 = nn.ReLU()
+        self.hidden_8 = nn.Linear(256, 256)
+        self.relu8 = nn.ReLU()
+        self.hidden_9 = nn.Linear(256, 256)
+        self.relu9 = nn.ReLU
+        self.to_density = nn.Linear(256, 1)
+        self.relu10 = nn.ReLU()
+        
+        self.harmonic_embedding_dir = HarmonicEmbedding(3, cfg.n_harmonic_functions_dir)
         embedding_dim_dir = self.harmonic_embedding_dir.output_dim
+        self.hidden_10 = nn.Linear(256 + embedding_dim_dir, 128)
+        self.relu11 = nn.ReLU()
         # print("shapes pts/dirs", embedding_dim_xyz, embedding_dim_dir)
         
-        self.xyz_hidden = nn.Linear(embedding_dim_xyz, cfg.n_hidden_neurons_xyz)
-        self.to_density = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
-        self.relu = nn.ReLU()
-        self.to_feature_vector = nn.Linear(cfg.n_hidden_neurons_xyz, 256)
-        total_feature = 256 + embedding_dim_dir
-        
-        self.dir_hidden = nn.Linear(total_feature, cfg.n_hidden_neurons_dir)
-        
-        self.to_color = nn.Linear(cfg.n_hidden_neurons_dir, 3)
+        self.to_color = nn.Linear(128, 3)
         self.sig = nn.Sigmoid()
         
         # view independent
-        self.to_color_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 3)
-        self.to_density_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
+        self.hidden_10_ind = nn.Linear(256, 128)
 
     def forward(self, ray_bundle):
+        """
         # view dependent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         n_points = pts.shape[1]
@@ -332,18 +346,37 @@ class NeuralRadianceField(torch.nn.Module):
         both = self.dir_hidden(both) # (B, hidden_dir)
         color = self.to_color(both) # (B, 3)
         color = self.sig(color) # (B, 3)
-        
         """
+        
         # view independent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
-        pts = self.xyz_hidden(pts) # (B, hidden_xyz)
-        color = self.to_color_ind(pts) # (B, 3)
-        color = self.sig(color)
-        sigma = self.to_density_ind(pts) # (B, 1)
-        sigma = self.relu(sigma)
-        """
+        features = self.hidden_1(pts) # (B, 256)
+        features = self.relu1(features) # (B, 256)
+        features = self.hidden_2(features) # (B, 256)
+        features = self.relu2(features) # (B, 256)
+        features = self.hidden_3(features) # (B, 256)
+        features = self.relu3(features) # (B, 256)
+        features = self.hidden_4(features) # (B, 256)
+        features = self.relu4(features) # (B, 256)
+        features = self.hidden_5(features) # (B, 256)
+        features = self.relu5(features) # (B, 256)
+        features = torch.cat((features, pts), dim = 1) # (B, 256 + hexyz_output_dim)
+        features = self.hidden_6(features) # (B, 256)
+        features = self.relu6(features) # (B, 256)
+        features = self.hidden_7(features) # (B, 256)
+        features = self.relu7(features) # (B, 256)
+        features = self.hidden_8(features) # (B, 256)
+        features = self.relu8(features) # (B, 256)
+        features_nosigma = self.hidden_9(features_nosigma) # (B, 256)
+        features_nosigma = self.relu9(features_nosigma) # (B, 256)
+        sigma = self.to_density(features) # (B, 1)
+        sigma = self.relu10(sigma) # (B, 1)
+        features_nosigma = self.hidden_10(features_nosigma) # (B, 128)
+        features_nosigma = self.relu11(features_nosigma) # (B, 128)
+        color = self.to_color(features_nosigma) # (B, 3)
+        color = self.sig(color) # (B, 3)
         
         return {"feature": color, "density": sigma}
 
