@@ -334,8 +334,8 @@ def train_nerf(
             rgb_gt = sample_images_at_xy(image, xy_grid)
 
             # Run model forward
-            print(type(model))
-            out = renderer(sampler, model, ray_bundle)
+            # print(type(model))
+            out = model(ray_bundle)
 
             # TODO (Q3.1): Calculate loss
             loss = torch.nn.functional.mse_loss(out["feature"], rgb_gt)
