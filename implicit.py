@@ -299,7 +299,13 @@ class NeuralRadianceField(torch.nn.Module):
         embedding_dim_dir = self.harmonic_embedding_dir.output_dim
 
         pass
-
+    def forward(self, ray_bundle):
+        pts = ray_bundle.sample_points # (B, 3)
+        dirs = ray_bundle.directions # (B, 3)
+        pts = self.harmonic_embedding_xyz(pts)
+        dirs = self.harmonic_embedding_dir(dirs)
+        print("shapes pts/dirs", pts.shape, dirs.shape)
+        assert False
 
 class NeuralSurface(torch.nn.Module):
     def __init__(
