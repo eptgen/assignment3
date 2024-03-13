@@ -306,7 +306,7 @@ class NeuralRadianceField(torch.nn.Module):
         
         self.to_color = nn.Linear(total_hidden, 3)
         self.sig = nn.Sigmoid()
-        self.to_density = nn.Linear(total_hidden, 3)
+        self.to_density = nn.Linear(total_hidden, 1)
         self.relu = nn.ReLU()
 
     def forward(self, ray_bundle):
@@ -321,8 +321,8 @@ class NeuralRadianceField(torch.nn.Module):
         both = torch.cat((pts, dirs), dim = 1) # (B, hidden_xyz + hidden_dir)
         color = self.to_color(both) # (B, 3)
         color = self.sig(color) # (B, 3)
-        sigma = self.to_density(both) # (B, 3)
-        sigma = self.relu(sigma) # (B, 3)
+        sigma = self.to_density(both) # (B, 1)
+        sigma = self.relu(sigma) # (B, 1)
         return {"feature": color, "density": sigma}
 
 class NeuralSurface(torch.nn.Module):

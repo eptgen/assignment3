@@ -80,9 +80,9 @@ class VolumeRenderer(torch.nn.Module):
             implicit_output = implicit_fn(cur_ray_bundle)
             density = implicit_output['density']
             feature = implicit_output['feature']
-            print("density", density.shape)
-            print("feature", feature.shape)
-            print("ray bundle", cur_ray_bundle.shape)
+            # print("density", density.shape)
+            # print("feature", feature.shape)
+            # print("ray bundle", cur_ray_bundle.shape)
             # print("density L0", torch.norm(density, p = 0))
 
             # Compute length of each ray segment
