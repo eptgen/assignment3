@@ -337,7 +337,9 @@ class NeuralRadianceField(torch.nn.Module):
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
         pts = self.xyz_hidden(pts) # (B, hidden_xyz)
         color = self.to_color_ind(pts) # (B, 3)
+        color = self.sig(color)
         sigma = self.to_density_ind(pts) # (B, 1)
+        sigma = self.relu(sigma)
         
         return {"feature": color, "density": sigma}
 
