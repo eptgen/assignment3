@@ -65,6 +65,8 @@ class VolumeRenderer(torch.nn.Module):
 
         # Process the chunks of rays.
         chunk_outputs = []
+        
+        print("B, chunk_size", B, self._chunk_size)
 
         for chunk_start in range(0, B, self._chunk_size):
             cur_ray_bundle = ray_bundle[chunk_start:chunk_start+self._chunk_size]
