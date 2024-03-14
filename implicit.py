@@ -469,7 +469,6 @@ class NeuralRadianceField(torch.nn.Module):
         cfg,
     ):
         super().__init__()
-        print(self)
         self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
         embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
         self.n_layers_xyz = cfg.n_layers_xyz
@@ -485,10 +484,11 @@ class NeuralRadianceField(torch.nn.Module):
             if i + 1 in self.append_xyz:
                 fc_in = hidden_neurons_xyz + embedding_dim_xyz
             fc_out = hidden_neurons_xyz
+            if i == self.n_layers_xyz - 1:
+                fc_out = hidden_neurons_xyz + 1
             self.fcs.append(nn.Linear(fc_in, fc_out, device = "cuda"))
             self.relus.append(nn.ReLU())
             
-        self.to_sigma = nn.Linear(hidden_neurons_xyz, 1, device = "cuda")
         self.relu_sigma = nn.ReLU()
         self.to_color = nn.Linear(hidden_neurons_xyz, 3, device = "cuda")
         self.sigmoid_color = nn.Sigmoid()
@@ -501,12 +501,13 @@ class NeuralRadianceField(torch.nn.Module):
         for i in range(self.n_layers_xyz):
             if i + 1 in self.append_xyz:
                 features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
-            features = self.fcs[i](features) # (B, hidden_xyz)
-            features = self.relus[i](features) # (B, hidden_xyz)
+            features = self.fcs[i](features) # (B, hidden_xyz) or (B, hidden_xyz + 1)
+            if i != self.n_layers_xyz - 1: features = self.relus[i](features) # (B, hidden_xyz + 1)
+        sigma = features[:, 0] # (B, 1)
+        sigma = self.relu_sigma(sigma) # (B, 1)
+        features = features[:, 1:] # (B, hidden_xyz)
         color = self.to_color(features) # (B, 3)
         color = self.sigmoid_color(color) # (B, 3)
-        sigma = self.to_sigma(features) # (B, 1)
-        sigma = self.relu_sigma(sigma) # (B, 1)
         
         return {"feature": color, "density": sigma}
 
