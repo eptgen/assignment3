@@ -469,6 +469,7 @@ class NeuralRadianceField(torch.nn.Module):
         cfg,
     ):
         super().__init__()
+        print(self)
         self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
         embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
         self.n_layers_xyz = cfg.n_layers_xyz
@@ -500,7 +501,7 @@ class NeuralRadianceField(torch.nn.Module):
         for i in range(self.n_layers_xyz):
             if i + 1 in self.append_xyz:
                 features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
-            features = self.fcs[i](features)
+            features = self.fcs[i](features) # (B, hidden_xyz)
             features = self.relus[i](features) # (B, hidden_xyz)
         color = self.to_color(features) # (B, 3)
         color = self.sigmoid_color(color) # (B, 3)
