@@ -474,20 +474,23 @@ class NeuralRadianceField(torch.nn.Module):
         hidden_neurons_xyz = cfg.n_hidden_neurons_xyz
         self.append_xyz = cfg.append_xyz
         
-        layers = []
+        layers = [[]]
+        num_seq = 0
         for i in range(self.n_layers_xyz):
             fc_in = hidden_neurons_xyz
             if i == 0:
                 fc_in = embedding_dim_xyz
             if i in self.append_xyz:
                 fc_in = hidden_neurons_xyz + embedding_dim_xyz
+                layers.append([])
+                num_seq += 1
             fc_out = hidden_neurons_xyz
             if i == self.n_layers_xyz - 1:
                 fc_out = hidden_neurons_xyz + 1
-            layers.append(nn.Linear(fc_in, fc_out, device = "cuda"))
+            layers[num_seq].append(nn.Linear(fc_in, fc_out, device = "cuda"))
             if i != self.n_layers_xyz - 1: layers.append(nn.ReLU())
          
-        self.layers = torch.nn.Sequential(*layers)
+        self.layers = torch.nn.Sequential(*[torch.nn.Sequential(*layer) for layer in layers])
         
         self.relu_sigma = nn.ReLU()
         self.to_color = nn.Linear(hidden_neurons_xyz, 3, device = "cuda")
