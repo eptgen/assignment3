@@ -481,7 +481,7 @@ class NeuralRadianceField(torch.nn.Module):
             fc_in = hidden_neurons_xyz
             if i == 0:
                 fc_in = embedding_dim_xyz
-            if i + 1 in self.append_xyz:
+            if i in self.append_xyz:
                 fc_in = hidden_neurons_xyz + embedding_dim_xyz
             fc_out = hidden_neurons_xyz
             if i == self.n_layers_xyz - 1:
@@ -499,7 +499,7 @@ class NeuralRadianceField(torch.nn.Module):
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
         features = pts # (B, hexyz_output_dim)
         for i in range(self.n_layers_xyz):
-            if i + 1 in self.append_xyz:
+            if i in self.append_xyz:
                 features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
             features = self.fcs[i](features) # (B, hidden_xyz) or (B, hidden_xyz + 1)
             if i != self.n_layers_xyz - 1: features = self.relus[i](features) # (B, hidden_xyz + 1)
