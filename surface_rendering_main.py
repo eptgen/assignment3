@@ -284,6 +284,10 @@ def train_points(
                     model, create_surround_cameras(3.0, n_poses=20, up=(0.0, 1.0, 0.0), focal_length=2.0),
                     cfg.data.image_size, file_prefix='eikonal', thresh=0.002,
                 )
+                i = 0
+                for im in test_images:
+                    imageio.imsave(f"images/part_6/part_6_{i}.png", np.uint8(im * 255))
+                    i += 1
                 imageio.mimsave('images/part_6.gif', [np.uint8(im * 255) for im in test_images])
             except Exception as e:
                 print("Empty mesh")
