@@ -239,6 +239,7 @@ def train_points(
             distances, gradients = model.implicit_fn.get_distance_and_gradient(points)
             
             loss = torch.sum(torch.abs(distances))
+            print("distances", loss)
 
             # Sample random points in bounding box
             eikonal_points = get_random_points(
@@ -282,7 +283,7 @@ def train_points(
             try:
                 test_images = render_geometry(
                     model, create_surround_cameras(3.0, n_poses=20, up=(0.0, 1.0, 0.0), focal_length=2.0),
-                    cfg.data.image_size, file_prefix='eikonal', thresh=0.002, save = True
+                    cfg.data.image_size, file_prefix='eikonal', thresh=0.002
                 )
                 i = 0
                 for im in test_images:
