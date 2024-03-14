@@ -524,17 +524,24 @@ class NeuralSurface(torch.nn.Module):
         self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
         embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
         self.n_layers_dist = cfg.n_layers_distance
+        self.append_dist = cfg.append_distance
         hidden_neurons_dist = cfg.n_hidden_neurons_distance
         
-        layers = []
-        for i in range(self.n_layers_dist):
+        layers = [[]]
+        num_seq = 0
+        for i in range(self.n_layers_xyz):
             fc_in = hidden_neurons_dist
             if i == 0:
                 fc_in = embedding_dim_xyz
+            if i in self.append_dist:
+                fc_in = hidden_neurons_dist + embedding_dim_xyz
+                layers.append([])
+                num_seq += 1
             fc_out = hidden_neurons_dist
-            layers.append(nn.Linear(fc_in, fc_out, device = "cuda"))
-            if i != self.n_layers_dist - 1: layers.append(nn.ReLU())
-        self.layers = nn.Sequential(*layers)
+            layers[num_seq].append(nn.Linear(fc_in, fc_out, device = "cuda"))
+            layers[num_seq].append(nn.ReLU())
+        
+        self.layers = torch.nn.Sequential(*[torch.nn.Sequential(*layer) for layer in layers])
         
         self.to_sd = nn.Linear(hidden_neurons_dist, 1, device = "cuda")
         # TODO (Q7): Implement Neural Surface MLP to output per-point color
@@ -550,7 +557,11 @@ class NeuralSurface(torch.nn.Module):
         '''
         points = points.view(-1, 3) # (B, 3)
         points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
-        points = self.layers(points)
+        features = points
+        for layer in self.layers:
+            features = layer(features)
+            if layer in self.append_dist:
+                features = torch.cat((features, points), dim = 1)
         sds = self.to_sd(points)
         return sds
     
