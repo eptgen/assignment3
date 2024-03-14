@@ -377,7 +377,11 @@ def train_nerf(
                     model, create_surround_cameras(4.0, n_poses=20, up=(0.0, 0.0, 1.0), focal_length=2.0),
                     cfg.data.image_size, file_prefix='nerf'
                 )
-                imageio.mimsave('images/part_3.gif', [np.uint8(im * 255) for im in test_images])
+                i = 0
+                for im in test_images:
+                    imageio.imsave(f"images/part_3/part_3_{i}.png", np.uint8(im * 255))
+                    i += 1
+                imageio.mimsave('images/part_3.gif', [np.uint8(im * 255) for im in test_images], "GIF-FI")
 
 
 @hydra.main(config_path='./configs', config_name='sphere')
