@@ -238,7 +238,7 @@ def train_points(
             # Get distances and enforce point cloud loss
             distances, gradients = model.implicit_fn.get_distance_and_gradient(points)
             
-            loss = torch.norm(distances)
+            loss = torch.norm(distances.squeeze())
 
             # Sample random points in bounding box
             eikonal_points = get_random_points(
