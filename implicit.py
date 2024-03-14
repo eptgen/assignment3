@@ -470,7 +470,7 @@ class NeuralRadianceField(torch.nn.Module):
         self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
         embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
         self.n_layers_xyz = cfg.n_layers_xyz
-        hidden_neurons_xyz = cfg.hidden_neurons_xyz
+        hidden_neurons_xyz = cfg.n_hidden_neurons_xyz
         self.append_xyz = cfg.append_xyz
         
         self.fcs = []
