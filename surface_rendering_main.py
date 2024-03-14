@@ -255,7 +255,7 @@ def train_points(
             loss.backward()
             optimizer.step()
 
-            t_range.set_description(f'Epoch: {epoch:04d}, Loss: {point_loss:.06f}')
+            t_range.set_description(f'Epoch: {epoch:04d}, Loss: {loss:.06f}')
             t_range.refresh()
 
         # Checkpoint.
