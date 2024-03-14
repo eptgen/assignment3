@@ -3,3 +3,4 @@ outputs/
 *.pth
 lego.png
 checkpoints
+points_checkpoint
