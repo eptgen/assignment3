@@ -494,6 +494,7 @@ class NeuralRadianceField(torch.nn.Module):
 
     def forward(self, ray_bundle):
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
+        n_points = pts.shape[1]
         pts = pts.view(-1, 3) # (B, 3)
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
         features = pts # (B, hexyz_output_dim)
@@ -503,9 +504,9 @@ class NeuralRadianceField(torch.nn.Module):
             features = self.fcs[i](features) # (B, hidden_xyz) or (B, hidden_xyz + 1)
             if i != self.n_layers_xyz - 1: features = self.relus[i](features) # (B, hidden_xyz)
         sigma = features[:, 0] # (B, 1)
-        sigma = self.relu_sigma(sigma) # (B, 1)
+        sigma = self.relu_sigma(sigma).view(-1, n_points, 1) # (B, 1)
         color = self.to_color(features[:, 1:]) # (B, 3)
-        color = self.sigmoid_color(color) # (B, 3)
+        color = self.sigmoid_color(color).view(-1, n_points, 3) # (B, 3)
         
         return {"feature": color, "density": sigma}
 
