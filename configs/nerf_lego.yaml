@@ -40,7 +40,7 @@ implicit_function:
   n_hidden_neurons_xyz: 128
   n_hidden_neurons_dir: 64
   density_noise_std: 0.0
-  n_layers_xyz: 2
+  n_layers_xyz: 1
   append_xyz: []
 
 
