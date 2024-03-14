@@ -529,7 +529,7 @@ class NeuralSurface(torch.nn.Module):
         
         layers = [[]]
         num_seq = 0
-        for i in range(self.n_layers_xyz):
+        for i in range(self.n_layers_dist):
             fc_in = hidden_neurons_dist
             if i == 0:
                 fc_in = embedding_dim_xyz
