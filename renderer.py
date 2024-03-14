@@ -172,7 +172,7 @@ class SphereTracingRenderer(torch.nn.Module):
         while it < self.max_iters:
             dists = implicit_fn(points) # (N, 1)
             points += directions * dists
-            mask = mask and (dists < self.far)
+            mask = torch.logical_and(mask, dists < self.far)
             it += 1
         return (points, mask)
 
