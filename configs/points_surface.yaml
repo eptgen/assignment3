@@ -41,10 +41,10 @@ training:
 implicit_function:
   type: neural_surface
 
-  n_harmonic_functions_xyz: 4
+  n_harmonic_functions_xyz: 6
 
   n_layers_distance: 6
-  n_hidden_neurons_distance: 128
+  n_hidden_neurons_distance: 256
   append_distance: []
 
   n_layers_color: 2
