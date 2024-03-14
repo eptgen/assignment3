@@ -487,7 +487,7 @@ class NeuralRadianceField(torch.nn.Module):
             
         self.to_sigma = nn.Linear(hidden_neurons_xyz, 1)
         self.relu_sigma = nn.ReLU()
-        self.to_color = nn.Linear(hidden_neurosn_xyz, 3)
+        self.to_color = nn.Linear(hidden_neurons_xyz, 3)
         self.sigmoid_color = nn.Sigmoid()
 
     def forward(self, ray_bundle):
