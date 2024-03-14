@@ -502,7 +502,7 @@ class NeuralRadianceField(torch.nn.Module):
             if i in self.append_xyz:
                 features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
             features = self.fcs[i](features) # (B, hidden_xyz) or (B, hidden_xyz + 1)
-            if i != self.n_layers_xyz - 1: features = self.relus[i](features) # (B, hidden_xyz + 1)
+            if i != self.n_layers_xyz - 1: features = self.relus[i](features) # (B, hidden_xyz)
         sigma = features[:, 0] # (B, 1)
         sigma = self.relu_sigma(sigma) # (B, 1)
         features = features[:, 1:] # (B, hidden_xyz)
