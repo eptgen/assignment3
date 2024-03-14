@@ -504,7 +504,7 @@ class NeuralRadianceField(torch.nn.Module):
         features = pts
         i = 0
         for layer in self.layers:
-            features = layer(pts)
+            features = layer(features)
             if i != len(self.layers) - 1: features = torch.cat((features, pts), dim = 1)
             i += 1
         sigma = features[:, 0] # (B, 1)
