@@ -533,7 +533,7 @@ class NeuralSurface(torch.nn.Module):
                 fc_in = embedding_dim_xyz
             fc_out = hidden_neurons_dist
             layers.append(nn.Linear(fc_in, fc_out, device = "cuda"))
-            layers.append(nn.ReLU())
+            if i != self.n_layers_dist - 1: layers.append(nn.ReLU())
         self.layers = nn.Sequential(*layers)
         
         self.to_sd = nn.Linear(hidden_neurons_dist, 1, device = "cuda")
