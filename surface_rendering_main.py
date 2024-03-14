@@ -424,6 +424,7 @@ def train_images(
 @hydra.main(config_path='configs', config_name='torus')
 def main(cfg: DictConfig):
     os.chdir(hydra.utils.get_original_cwd())
+    torch.autograd.set_detect_anomaly(True)
 
     if cfg.type == 'render':
         render(cfg)
