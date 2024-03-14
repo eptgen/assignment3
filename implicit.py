@@ -316,7 +316,7 @@ class NeuralRadianceField(torch.nn.Module):
         self.to_density_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
 
     def forward(self, ray_bundle):
-    """
+        """
         # view dependent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         n_points = pts.shape[1]
