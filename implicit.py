@@ -526,15 +526,15 @@ class NeuralSurface(torch.nn.Module):
         self.n_layers_dist = cfg.n_layers_distance
         hidden_neurons_dist = cfg.n_hidden_neurons_distance
         
-        self.fcs = []
-        self.relus = []
+        layers = []
         for i in range(self.n_layers_dist):
             fc_in = hidden_neurons_dist
             if i == 0:
                 fc_in = embedding_dim_xyz
             fc_out = hidden_neurons_dist
-            self.fcs.append(nn.Linear(fc_in, fc_out, device = "cuda"))
-            self.relus.append(nn.ReLU())
+            layers.append(nn.Linear(fc_in, fc_out, device = "cuda"))
+            layers.append(nn.ReLU())
+        self.layers = nn.Sequential(*layers)
         
         self.to_sd = nn.Linear(hidden_neurons_dist, 1, device = "cuda")
         # TODO (Q7): Implement Neural Surface MLP to output per-point color
@@ -550,9 +550,7 @@ class NeuralSurface(torch.nn.Module):
         '''
         points = points.view(-1, 3) # (B, 3)
         points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
-        for i in range(self.n_layers_dist):
-            points = self.fcs[i](points)
-            points = self.relus[i](points)
+        points = self.layers(points)
         sds = self.to_sd(points)
         return sds
     
