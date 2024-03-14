@@ -484,8 +484,6 @@ class NeuralRadianceField(torch.nn.Module):
             if i in self.append_xyz:
                 fc_in = hidden_neurons_xyz + embedding_dim_xyz
             fc_out = hidden_neurons_xyz
-            if i == self.n_layers_xyz - 1:
-                fc_out = hidden_neurons_xyz + 1
             self.fcs.append(nn.Linear(fc_in, fc_out, device = "cuda"))
             self.relus.append(nn.ReLU())
         
