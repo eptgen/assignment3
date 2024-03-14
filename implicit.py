@@ -284,7 +284,69 @@ class MLPWithInputSkips(torch.nn.Module):
 
         return y
 
+"""
+# legacy neuralradiancefield (better?)
+class NeuralRadianceField(torch.nn.Module):
+    def __init__(
+        self,
+        cfg,
+    ):
+        super().__init__()
 
+        self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
+        self.harmonic_embedding_dir = HarmonicEmbedding(3, cfg.n_harmonic_functions_dir)
+
+        embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
+        embedding_dim_dir = self.harmonic_embedding_dir.output_dim
+        # print("shapes pts/dirs", embedding_dim_xyz, embedding_dim_dir)
+        
+        self.xyz_hidden = nn.Linear(embedding_dim_xyz, cfg.n_hidden_neurons_xyz)
+        self.to_density = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
+        self.relu = nn.ReLU()
+        self.to_feature_vector = nn.Linear(cfg.n_hidden_neurons_xyz, 256)
+        total_feature = 256 + embedding_dim_dir
+        
+        self.dir_hidden = nn.Linear(total_feature, cfg.n_hidden_neurons_dir)
+        
+        self.to_color = nn.Linear(cfg.n_hidden_neurons_dir, 3)
+        self.sig = nn.Sigmoid()
+        
+        # view independent
+        self.to_color_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 3)
+        self.to_density_ind = nn.Linear(cfg.n_hidden_neurons_xyz, 1)
+
+    def forward(self, ray_bundle):
+        # view dependent
+        pts = ray_bundle.sample_points # (H*W, n_points, 3)
+        n_points = pts.shape[1]
+        pts = pts.reshape(-1, 3) # (B, 3)
+        dirs = (ray_bundle.directions.unsqueeze(1) * torch.ones(n_points, 1, device = "cuda")).reshape(-1, 3) # (B, 3)
+        pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
+        dirs = self.harmonic_embedding_dir(dirs) # (B, hedir_output_dim)
+        pts = self.xyz_hidden(pts) # (B, hidden_xyz)
+        sigma = self.to_density(pts) # (B, 1)
+        sigma = self.relu(sigma) # (B, 1)
+        
+        features = self.to_feature_vector(pts) # (B, 256)
+        both = torch.cat((features, dirs), dim = 1) # (B, 256 + hedir_output_dim)
+        both = self.dir_hidden(both) # (B, hidden_dir)
+        color = self.to_color(both) # (B, 3)
+        color = self.sig(color) # (B, 3)
+        
+        # view independent
+        pts = ray_bundle.sample_points # (H*W, n_points, 3)
+        pts = pts.reshape(-1, 3) # (B, 3)
+        pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
+        pts = self.xyz_hidden(pts) # (B, hidden_xyz)
+        color = self.to_color_ind(pts) # (B, 3)
+        color = self.sig(color)
+        sigma = self.to_density_ind(pts) # (B, 1)
+        sigma = self.relu(sigma)
+        
+        return {"feature": color, "density": sigma}
+"""
+"""
+# legacy 8-layer
 # TODO (Q3.1): Implement NeRF MLP
 class NeuralRadianceField(torch.nn.Module):
     def __init__(
@@ -364,7 +426,6 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.to_color(features_nosigma) # (B, 3)
         color = self.sig(color) # (B, 3)
         
-        """
         # view independent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
@@ -394,7 +455,55 @@ class NeuralRadianceField(torch.nn.Module):
         features_nosigma = self.relu11(features_nosigma) # (B, 128)
         color = self.to_color(features_nosigma) # (B, 3)
         color = self.sig(color) # (B, 3)
-        """
+        
+        return {"feature": color, "density": sigma}
+"""
+
+# TODO (Q3.1): Implement NeRF MLP
+# View independent
+class NeuralRadianceField(torch.nn.Module):
+    def __init__(
+        self,
+        cfg,
+    ):
+        super().__init__()
+        self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
+        embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
+        self.n_layers_xyz = cfg.n_layers_xyz
+        hidden_neurons_xyz = cfg.hidden_neurons_xyz
+        self.append_xyz = cfg.append_xyz
+        
+        self.fcs = []
+        self.relus = []
+        for i in range(self.n_layers_xyz):
+            fc_in = hidden_neurons_xyz
+            if i == 0:
+                fc_in = embedding_dim_xyz
+            if i + 1 in self.append_xyz:
+                fc_in = hidden_neurons_xyz + embedding_dim_xyz
+            fc_out = hidden_neurons_xyz
+            self.fcs.append(nn.Linear(fc_in, fc_out))
+            self.relus.append(nn.ReLU())
+            
+        self.to_sigma = nn.Linear(hidden_neurons_xyz, 1)
+        self.relu_sigma = nn.ReLU()
+        self.to_color = nn.Linear(hidden_neurosn_xyz, 3)
+        self.sigmoid_color = nn.Sigmoid()
+
+    def forward(self, ray_bundle):
+        pts = ray_bundle.sample_points # (H*W, n_points, 3)
+        pts = pts.reshape(-1, 3) # (B, 3)
+        pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
+        features = pts # (B, hexyz_output_dim)
+        for i in range(self.n_layers_xyz):
+            if i + 1 in append_xyz:
+                features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
+            features = self.fcs[i](features)
+            features = self.relus[i](features) # (B, hidden_xyz)
+        color = self.to_color(features) # (B, 3)
+        color = self.sigmoid_color(color) # (B, 3)
+        sigma = self.to_sigma(features) # (B, 1)
+        sigma = self.relu_sigma(sigma) # (B, 1)
         
         return {"feature": color, "density": sigma}
 
