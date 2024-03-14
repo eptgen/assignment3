@@ -381,7 +381,7 @@ def train_nerf(
                 for im in test_images:
                     imageio.imsave(f"images/part_3/part_3_{i}.png", np.uint8(im * 255))
                     i += 1
-                imageio.mimsave('images/part_3.gif', [np.uint8(im * 255) for im in test_images], "GIF-FI")
+                imageio.mimsave('images/part_3.gif', [np.uint8(im * 255) for im in test_images])
 
 
 @hydra.main(config_path='./configs', config_name='sphere')
