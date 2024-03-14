@@ -519,7 +519,7 @@ class NeuralSurface(torch.nn.Module):
         super().__init__()
         
         self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
-        embedding_dim_xyz = self.harmonic_embedding_dist.output_dim
+        embedding_dim_xyz = self.harmonic_embedding_xyz.output_dim
         self.n_layers_dist = cfg.n_layers_distance
         hidden_neurons_dist = cfg.n_hidden_neurons_distance
         
