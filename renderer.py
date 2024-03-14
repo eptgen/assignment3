@@ -165,7 +165,16 @@ class SphereTracingRenderer(torch.nn.Module):
         #   in order to compute intersection points of rays with the implicit surface
         # 2) Maintain a mask with the same batch dimension as the ray origins,
         #   indicating which points hit the surface, and which do not
-        pass
+        it = 0
+        N = origins.shape[0]
+        points = origins # (N, 3)
+        mask = torch.zeros(N, 1, dtype = torch.bool, device = "cuda") # (N, 1)
+        while it < self.max_iters:
+            dists = implicit_fn(points).unsqueeze(1) # (N, 1)
+            points += directions * dists
+            mask = mask and (dists < self.far)
+            it += 1
+        return (points, mask)
 
     def forward(
         self,
