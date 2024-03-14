@@ -502,9 +502,11 @@ class NeuralRadianceField(torch.nn.Module):
         pts = pts.view(-1, 3) # (B, 3)
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
         features = pts
+        i = 0
         for layer in self.layers:
             features = layer(pts)
-            features = torch.cat((features, pts), dim = 1)
+            if i != len(self.layers) - 1: features = torch.cat((features, pts), dim = 1)
+            i += 1
         sigma = features[:, 0] # (B, 1)
         sigma = self.relu_sigma(sigma).view(-1, n_points, 1) # (B, 1)
         color = self.to_color(features[:, 1:]) # (B, 3)
