@@ -29,10 +29,10 @@ training:
   lr_scheduler_gamma: 0.8
 
   checkpoint_path: ./points_checkpoint
-  checkpoint_interval: 100
-  resume: True
+  checkpoint_interval: 1000
+  resume: False
 
-  render_interval: 500
+  render_interval: 100
 
   inter_weight: 0.1
   eikonal_weight: 0.02
