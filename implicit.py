@@ -284,6 +284,7 @@ class MLPWithInputSkips(torch.nn.Module):
 
         return y
 
+"""
 # legacy neuralradiancefield (better?)
 class NeuralRadianceField(torch.nn.Module):
     def __init__(
@@ -333,7 +334,6 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.to_color(both) # (B, 3)
         color = self.sig(color) # (B, 3)
         
-        """
         # view independent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
@@ -343,10 +343,10 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.sig(color)
         sigma = self.to_density_ind(pts) # (B, 1)
         sigma = self.relu(sigma)
-        """
         
         return {"feature": color, "density": sigma}
         
+"""
 """
 # legacy 8-layer
 # TODO (Q3.1): Implement NeRF MLP
@@ -461,7 +461,6 @@ class NeuralRadianceField(torch.nn.Module):
         return {"feature": color, "density": sigma}
 """
 
-"""
 # View independent
 class NeuralRadianceField(torch.nn.Module):
     def __init__(
@@ -495,7 +494,7 @@ class NeuralRadianceField(torch.nn.Module):
 
     def forward(self, ray_bundle):
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
-        pts = pts.reshape(-1, 3) # (B, 3)
+        pts = pts.view(-1, 3) # (B, 3)
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
         features = pts # (B, hexyz_output_dim)
         for i in range(self.n_layers_xyz):
@@ -509,7 +508,6 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.sigmoid_color(color) # (B, 3)
         
         return {"feature": color, "density": sigma}
-"""
 
 class NeuralSurface(torch.nn.Module):
     def __init__(
