@@ -212,6 +212,7 @@ def train_points(
 ):
     # Create model
     model, optimizer, lr_scheduler, start_epoch, checkpoint_path = create_model(cfg)
+    print("model", model)
 
     # Pretrain SDF
     pretrain_sdf(cfg, model)
