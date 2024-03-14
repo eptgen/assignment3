@@ -551,7 +551,7 @@ class NeuralRadianceField(torch.nn.Module):
         
         self.harmonic_embedding_dir = HarmonicEmbedding(3, cfg.n_harmonic_functions_dir)
         embedding_dim_dir = self.harmonic_embedding_dir.output_dim
-        hidden_neurons_dir = cfg.hidden_neurons_dir
+        hidden_neurons_dir = cfg.n_hidden_neurons_dir
         self.fc_color = nn.Linear(hidden_neurons_xyz + embedding_dim_dir, hidden_neurons_dir, device = "cuda")
         self.relu_color = nn.ReLU()
         self.to_color = nn.Linear(hidden_neurons_dir, 3, device = "cuda")
