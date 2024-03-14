@@ -1,6 +1,6 @@
 import imageio
 
-NAME = "part_1"
+NAME = "part_5"
 NUM_FRAMES = 20
 FPS = 15
 
