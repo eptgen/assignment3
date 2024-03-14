@@ -231,7 +231,6 @@ def render_geometry(
             image = mesh_renderer(mesh, cameras=cameras[cam_idx].to(device))
             image = image[0,:,:,:3].detach().cpu().numpy()
             all_images.append(image)
-            print("hi")
 
             # Save
             if save:
