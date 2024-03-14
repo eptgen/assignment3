@@ -284,7 +284,6 @@ class MLPWithInputSkips(torch.nn.Module):
 
         return y
 
-"""
 # legacy neuralradiancefield (better?)
 class NeuralRadianceField(torch.nn.Module):
     def __init__(
@@ -334,7 +333,7 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.to_color(both) # (B, 3)
         color = self.sig(color) # (B, 3)
         
-        
+        """
         # view independent
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
@@ -344,9 +343,9 @@ class NeuralRadianceField(torch.nn.Module):
         color = self.sig(color)
         sigma = self.to_density_ind(pts) # (B, 1)
         sigma = self.relu(sigma)
+        """
         
         return {"feature": color, "density": sigma}
-"""
         
 """
 # legacy 8-layer
@@ -462,6 +461,7 @@ class NeuralRadianceField(torch.nn.Module):
         return {"feature": color, "density": sigma}
 """
 
+"""
 # View independent
 class NeuralRadianceField(torch.nn.Module):
     def __init__(
@@ -484,27 +484,16 @@ class NeuralRadianceField(torch.nn.Module):
             if i in self.append_xyz:
                 fc_in = hidden_neurons_xyz + embedding_dim_xyz
             fc_out = hidden_neurons_xyz
+            if i == self.n_layers_xyz - 1:
+                fc_out = hidden_neurons_xyz + 1
             self.fcs.append(nn.Linear(fc_in, fc_out, device = "cuda"))
             self.relus.append(nn.ReLU())
         
-        self.to_sigma = nn.Linear(hidden_neurons_xyz, 1, device = "cuda")
         self.relu_sigma = nn.ReLU()
         self.to_color = nn.Linear(hidden_neurons_xyz, 3, device = "cuda")
         self.sigmoid_color = nn.Sigmoid()
 
     def forward(self, ray_bundle):
-        """
-        
-        # view independent
-        pts = ray_bundle.sample_points # (H*W, n_points, 3)
-        pts = pts.reshape(-1, 3) # (B, 3)
-        pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
-        pts = self.xyz_hidden(pts) # (B, hidden_xyz)
-        color = self.to_color_ind(pts) # (B, 3)
-        color = self.sig(color)
-        sigma = self.to_density_ind(pts) # (B, 1)
-        sigma = self.relu(sigma)
-        """
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
@@ -514,12 +503,13 @@ class NeuralRadianceField(torch.nn.Module):
                 features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
             features = self.fcs[i](features) # (B, hidden_xyz) or (B, hidden_xyz + 1)
             if i != self.n_layers_xyz - 1: features = self.relus[i](features) # (B, hidden_xyz)
-        sigma = self.to_sigma(features) # (B, 1)
+        sigma = features[:, 0] # (B, 1)
         sigma = self.relu_sigma(sigma) # (B, 1)
-        color = self.to_color(features) # (B, 3)
+        color = self.to_color(features[:, 1:]) # (B, 3)
         color = self.sigmoid_color(color) # (B, 3)
         
         return {"feature": color, "density": sigma}
+"""
 
 class NeuralSurface(torch.nn.Module):
     def __init__(
@@ -527,7 +517,23 @@ class NeuralSurface(torch.nn.Module):
         cfg,
     ):
         super().__init__()
-        # TODO (Q6): Implement Neural Surface MLP to output per-point SDF
+        
+        self.harmonic_embedding_xyz = HarmonicEmbedding(3, cfg.n_harmonic_functions_xyz)
+        embedding_dim_xyz = self.harmonic_embedding_dist.output_dim
+        self.n_layers_dist = cfg.n_layers_distance
+        hidden_neurons_dist = cfg.n_hidden_neurons_distance
+        
+        self.fcs = []
+        self.relus = []
+        for i in range(self.n_layers_dist):
+            fc_in = hidden_neurons_dist
+            if i == 0:
+                fc_in = embedding_dim_xyz
+            fc_out = hidden_neurons_dist
+            self.fcs.append(nn.Linear(fc_in, fc_out, device = "cuda"))
+            self.relus.append(nn.ReLU())
+        
+        self.to_sd = nn.Linear(hidden_neurons_dist, 1, device = "cuda")
         # TODO (Q7): Implement Neural Surface MLP to output per-point color
 
     def get_distance(
@@ -539,8 +545,13 @@ class NeuralSurface(torch.nn.Module):
         Output:
             distance: N X 1 Tensor, where N is number of input points
         '''
-        points = points.view(-1, 3)
-        pass
+        points = points.view(-1, 3) # (B, 3)
+        points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
+        for i in range(self.n_layers_dist):
+            points = self.fcs[i](points)
+            points = self.relus[i](points)
+        sds = self.to_sd(points)
+        return sds
     
     def get_color(
         self,
