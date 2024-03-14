@@ -239,7 +239,6 @@ def train_points(
             distances, gradients = model.implicit_fn.get_distance_and_gradient(points)
             
             loss = torch.sum(torch.abs(distances))
-            print("distances", loss)
 
             # Sample random points in bounding box
             eikonal_points = get_random_points(
