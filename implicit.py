@@ -483,12 +483,12 @@ class NeuralRadianceField(torch.nn.Module):
                 fc_in = hidden_neurons_xyz + embedding_dim_xyz
             fc_out = hidden_neurons_xyz
             self.fcs.append(nn.Linear(fc_in, fc_out, device = "cuda"))
-            self.relus.append(nn.ReLU(device = "cuda"))
+            self.relus.append(nn.ReLU())
             
         self.to_sigma = nn.Linear(hidden_neurons_xyz, 1, device = "cuda")
-        self.relu_sigma = nn.ReLU(device = "cuda")
+        self.relu_sigma = nn.ReLU()
         self.to_color = nn.Linear(hidden_neurons_xyz, 3, device = "cuda")
-        self.sigmoid_color = nn.Sigmoid(device = "cuda")
+        self.sigmoid_color = nn.Sigmoid()
 
     def forward(self, ray_bundle):
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
