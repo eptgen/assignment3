@@ -494,7 +494,7 @@ class NeuralRadianceField(torch.nn.Module):
         pts = ray_bundle.sample_points # (H*W, n_points, 3)
         pts = pts.reshape(-1, 3) # (B, 3)
         pts = self.harmonic_embedding_xyz(pts) # (B, hexyz_output_dim)
-        features = pts # (B, hexyz_output_dim)
+        features = pts.cuda() # (B, hexyz_output_dim)
         for i in range(self.n_layers_xyz):
             if i + 1 in self.append_xyz:
                 features = torch.cat((features, pts), dim = 1) # (B, hidden_xyz + hexyz_output_dim)
