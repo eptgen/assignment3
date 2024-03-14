@@ -558,10 +558,11 @@ class NeuralSurface(torch.nn.Module):
         points = points.view(-1, 3) # (B, 3)
         points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
         features = points
+        i = 0
         for layer in self.layers:
             features = layer(features)
-            if layer in self.append_dist:
-                features = torch.cat((features, points), dim = 1)
+            if i != len(self.layers) - 1: features = torch.cat((features, points), dim = 1)
+            i += 1
         sds = self.to_sd(points)
         return sds
     
