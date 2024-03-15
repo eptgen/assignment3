@@ -192,6 +192,7 @@ def implicit_to_mesh(implicit_fn, scale=0.5, grid_size=128, device='cpu', color=
             sdfs[chunk_start:chunk_end] = implicit_fn.get_distance(grid[chunk_start:chunk_end,:]).view(-1)
 
         sdfs = sdfs.view(grid_size+1, grid_size+1, grid_size+1)
+        print(sdfs)
 
     vertices, triangles = mcubes.marching_cubes(sdfs.cpu().numpy(), thresh)
     # normalize to [-scale, scale]
