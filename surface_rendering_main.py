@@ -424,6 +424,10 @@ def train_images(
                     model, create_surround_cameras(4.0, n_poses=20, up=(0.0, 0.0, 1.0), focal_length=2.0),
                     cfg.data.image_size, file_prefix='volsdf_geometry'
                 )
+                i = 0
+                for im in test_images:
+                    imageio.imsave(f"images/part_7/part_7_{i}.png", im)
+                    i += 1
                 imageio.mimsave('images/part_7_geometry.gif', [np.uint8(im * 255) for im in test_images])
             except Exception as e:
                 print("Empty mesh", e)
