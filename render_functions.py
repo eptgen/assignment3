@@ -194,7 +194,6 @@ def implicit_to_mesh(implicit_fn, scale=0.5, grid_size=128, device='cpu', color=
         sdfs = sdfs.view(grid_size+1, grid_size+1, grid_size+1)
         print(sdfs)
         print("min max", torch.min(sdfs), torch.max(sdfs))
-        print("argmin argmax", torch.argmin(sdfs, keepdim = True), torch.argmax(sdfs, keepdim = True))
 
     vertices, triangles = mcubes.marching_cubes(sdfs.cpu().numpy(), thresh)
     # normalize to [-scale, scale]
@@ -226,7 +225,7 @@ def render_geometry(
     lights = pytorch3d.renderer.PointLights(location=[[0, 0, -3]], device=device)
     mesh_renderer = get_mesh_renderer(image_size=image_size[0], lights=lights, device=device)
 
-    mesh = implicit_to_mesh(model.implicit_fn, scale=3, device=device, thresh=thresh)
+    mesh = implicit_to_mesh(model.implicit_fn, scale=9, device=device, thresh=thresh)
     all_images = []
     with torch.no_grad():
         torch.cuda.empty_cache()
