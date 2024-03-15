@@ -424,7 +424,7 @@ def train_images(
                 )
                 imageio.mimsave('images/part_7_geometry.gif', [np.uint8(im * 255) for im in test_images])
             except Exception as e:
-                print("Empty mesh")
+                print("Empty mesh", e)
                 pass
                 
 @hydra.main(config_path='configs', config_name='torus')
