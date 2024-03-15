@@ -9,5 +9,6 @@ To train the NeRF, run the command `python volume_rendering_main.py --config-nam
 
 Part B.
 
-To render the torus, run the command `python -m surface_rendering_main --config-name=torus_surface`, and the images should appear as PNGs in the images/part_5 folder.
+To render the torus, run the command `python -m surface_rendering_main --config-name=torus_surface`, and the images should appear as PNGs in the `images/part_5` directory.
 
+To train the Neural SDF, run the command `python -m surface_rendering_main --config-name=points_surface`, and the images should appear as PNGs in the `images/part_6` directory.

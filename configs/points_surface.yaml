@@ -23,7 +23,7 @@ training:
   num_epochs: 50000
   pretrain_iters: 250
   batch_size: 4096
-  lr: 0.0001
+  lr: 0.001
 
   lr_scheduler_step_size: 50
   lr_scheduler_gamma: 0.8
