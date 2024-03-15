@@ -194,7 +194,7 @@ def implicit_to_mesh(implicit_fn, scale=0.5, grid_size=128, device='cpu', color=
         sdfs = sdfs.view(grid_size+1, grid_size+1, grid_size+1)
         print(sdfs)
         print("min max", torch.min(sdfs), torch.max(sdfs))
-        print("argmin argmax", torch.argmin(sdfs), torch.argmax(sdfs))
+        print("argmin argmax", torch.argmin(sdfs, keepdim = False), torch.argmax(sdfs, keepdim = False))
 
     vertices, triangles = mcubes.marching_cubes(sdfs.cpu().numpy(), thresh)
     # normalize to [-scale, scale]
