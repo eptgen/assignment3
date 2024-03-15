@@ -11,8 +11,8 @@ renderer:
   chunk_size: 32768
   white_background: False
 
-  alpha: 5.0
-  beta: 0.005
+  alpha: 10.0
+  beta: 0.05
 
   relighting_function:
     type: none
