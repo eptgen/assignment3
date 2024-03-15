@@ -12,7 +12,7 @@ renderer:
   white_background: False
 
   alpha: 15.0
-  beta: 0.05
+  beta: 0.5
 
   relighting_function:
     type: none
