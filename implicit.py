@@ -605,7 +605,7 @@ class NeuralSurface(torch.nn.Module):
                 num_seq += 1
             fc_out = hidden_neurons_dist
             if i == self.n_layers_dist - 1:
-                fc_out = hidden_neurons_dist + 1
+                fc_out = 1
             layers[num_seq].append(nn.Linear(fc_in, fc_out, device = "cuda"))
             if i != self.n_layers_dist - 1: layers[num_seq].append(nn.ReLU())
         
@@ -618,7 +618,7 @@ class NeuralSurface(torch.nn.Module):
         for i in range(self.n_layers_color):
             fc_in = hidden_neurons_color
             if i == 0:
-                fc_in = hidden_neurons_dist
+                fc_in = embedding_dim_xyz
             fc_out = hidden_neurons_color
             layers_color.append(nn.Linear(fc_in, fc_out, device = "cuda"))
             layers_color.append(nn.ReLU())
@@ -656,7 +656,12 @@ class NeuralSurface(torch.nn.Module):
         Output:
             distance: N X 3 Tensor, where N is number of input points
         '''
-        return self.get_distance_color(points)[1]
+        points = points.view(-1, 3) # (B, 3)
+        points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
+        colors = self.layers_color(points) # (B, hidden_color)
+        colors = self.to_color(colors) # (B, 3)
+        colors = self.sigmoid_color(colors) # (B, 3)
+        return colors
     
     def get_distance_color(
         self,
@@ -669,20 +674,7 @@ class NeuralSurface(torch.nn.Module):
         You may just implement this by independent calls to get_distance, get_color
             but, depending on your MLP implementation, it maybe more efficient to share some computation
         '''
-        points = points.view(-1, 3) # (B, 3)
-        points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
-        features = points
-        i = 0
-        for layer in self.layers:
-            features = layer(features)
-            if i != len(self.layers) - 1: features = torch.cat((features, points), dim = 1)
-            i += 1
-        sds = features[:, 0] # (B, 1)
-        colors = features[:, 1:] # (B, hidden_dist)
-        colors = self.layers_color(colors) # (B, hidden_color)
-        colors = self.to_color(colors) # (B, 3)
-        colors = self.sigmoid_color(colors) # (B, 3)
-        return (sds, colors)
+        return (self.get_distance(points), self.get_color(points))
         
     def forward(self, points):
         return self.get_distance(points)
