@@ -292,7 +292,7 @@ def train_points(
                     i += 1
                 imageio.mimsave('images/part_6.gif', [np.uint8(im * 255) for im in test_images])
             except Exception as e:
-                print("Empty mesh")
+                print("Empty mesh", e)
                 pass
 
 
