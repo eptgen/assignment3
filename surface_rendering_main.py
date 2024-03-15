@@ -326,6 +326,7 @@ def train_images(
 ):
     # Create model
     model, optimizer, lr_scheduler, start_epoch, checkpoint_path = create_model(cfg)
+    print(model)
 
     # Load the training/validation data.
     train_dataset, val_dataset, _ = get_nerf_datasets(
