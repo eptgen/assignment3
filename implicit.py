@@ -604,13 +604,29 @@ class NeuralSurface(torch.nn.Module):
                 layers.append([])
                 num_seq += 1
             fc_out = hidden_neurons_dist
+            if i == self.n_layers_dist - 1:
+                fc_out = hidden_neurons_dist + 1
             layers[num_seq].append(nn.Linear(fc_in, fc_out, device = "cuda"))
             layers[num_seq].append(nn.ReLU())
         
         self.layers = torch.nn.Sequential(*[torch.nn.Sequential(*layer) for layer in layers])
+        self.to_sd = nn.Linear(hidden_neurons_dist, hidden_neurons_dist + 1, device = "cuda")
         
-        self.to_sd = nn.Linear(hidden_neurons_dist, 1, device = "cuda")
-        # TODO (Q7): Implement Neural Surface MLP to output per-point color
+        self.n_layers_color = cfg.n_layers_color
+        hidden_neurons_color = cfg.n_hidden_neurons_color
+        
+        layers_color = []
+        for i in range(self.n_layers_color):
+            fc_in = hidden_neurons_color
+            if i == 0:
+                fc_in = hidden_neurons_dist
+            fc_out = hidden_neurons_color
+            layers.append(nn.Linear(fc_in, fc_out, device = "cuda"))
+            layers.append(nn.ReLU())
+            
+        self.layers_color = nn.Sequential(*layers_color)
+        self.to_color = nn.Linear(hidden_neurons_color, 3, device = "cuda")
+        self.sigmoid_to_color = nn.Sigmoid()
 
     def get_distance(
         self,
@@ -629,7 +645,8 @@ class NeuralSurface(torch.nn.Module):
             features = layer(features)
             if i != len(self.layers) - 1: features = torch.cat((features, points), dim = 1)
             i += 1
-        sds = self.to_sd(features)
+        sds = features[:, 0] # (B, 1)
+        colors = features[:, 1:] # (B, hidden_dist)
         return sds
     
     def get_color(
@@ -641,8 +658,7 @@ class NeuralSurface(torch.nn.Module):
         Output:
             distance: N X 3 Tensor, where N is number of input points
         '''
-        points = points.view(-1, 3)
-        pass
+        return self.get_distance_color(points)[1]
     
     def get_distance_color(
         self,
@@ -655,6 +671,20 @@ class NeuralSurface(torch.nn.Module):
         You may just implement this by independent calls to get_distance, get_color
             but, depending on your MLP implementation, it maybe more efficient to share some computation
         '''
+        points = points.view(-1, 3) # (B, 3)
+        points = self.harmonic_embedding_xyz(points) # (B, hedist_dim)
+        features = points
+        i = 0
+        for layer in self.layers:
+            features = layer(features)
+            if i != len(self.layers) - 1: features = torch.cat((features, points), dim = 1)
+            i += 1
+        sds = features[:, 0] # (B, 1)
+        colors = features[:, 1:] # (B, hidden_dist)
+        colors = self.layers_color(colors) # (B, hidden_color)
+        colors = self.to_color(colors) # (B, 3)
+        colors = self.sigmoid_color(colors) # (B, 3)
+        return (sds, colors)
         
     def forward(self, points):
         return self.get_distance(points)
