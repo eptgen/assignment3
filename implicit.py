@@ -626,7 +626,7 @@ class NeuralSurface(torch.nn.Module):
             
         self.layers_color = nn.Sequential(*layers_color)
         self.to_color = nn.Linear(hidden_neurons_color, 3, device = "cuda")
-        self.sigmoid_to_color = nn.Sigmoid()
+        self.sigmoid_color = nn.Sigmoid()
 
     def get_distance(
         self,
