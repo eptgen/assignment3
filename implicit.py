@@ -621,8 +621,8 @@ class NeuralSurface(torch.nn.Module):
             if i == 0:
                 fc_in = hidden_neurons_dist
             fc_out = hidden_neurons_color
-            layers.append(nn.Linear(fc_in, fc_out, device = "cuda"))
-            if i != self.n_layers_color - 1: layers.append(nn.ReLU())
+            layers_color.append(nn.Linear(fc_in, fc_out, device = "cuda"))
+            layers_color.append(nn.ReLU())
             
         self.layers_color = nn.Sequential(*layers_color)
         self.to_color = nn.Linear(hidden_neurons_color, 3, device = "cuda")
@@ -678,6 +678,7 @@ class NeuralSurface(torch.nn.Module):
             features = layer(features)
             if i != len(self.layers) - 1: features = torch.cat((features, points), dim = 1)
             i += 1
+        features = self.to_sd(features) # (B, hidden_dist + 1)
         sds = features[:, 0] # (B, 1)
         colors = features[:, 1:] # (B, hidden_dist)
         colors = self.layers_color(colors) # (B, hidden_color)
