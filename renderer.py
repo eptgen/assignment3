@@ -223,8 +223,11 @@ class SphereTracingRenderer(torch.nn.Module):
 
 
 def sdf_to_density(signed_distance, alpha, beta):
-    # TODO (Q7): Convert signed distance to density with alpha, beta parameters
-    pass
+    def psi(s):
+        if s <= 0:
+            return 0.5 * torch.exp(s / beta)
+        return 1 - 0.5 * torch.exp(-s / beta)
+    return alpha * psi(-signed_distance)
 
 class VolumeSDFRenderer(VolumeRenderer):
     def __init__(
@@ -261,7 +264,7 @@ class VolumeSDFRenderer(VolumeRenderer):
 
             # Call implicit function with sample points
             distance, color = implicit_fn.get_distance_color(cur_ray_bundle.sample_points)
-            density = None # TODO (Q7): convert SDF to density
+            density = sdf_to_density(distance, self.alpha, self.beta) # TODO (Q7): convert SDF to density
 
             # Compute length of each ray segment
             depth_values = cur_ray_bundle.sample_lengths[..., 0]
