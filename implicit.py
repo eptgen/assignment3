@@ -644,8 +644,7 @@ class NeuralSurface(torch.nn.Module):
             features = layer(features)
             if i != len(self.layers) - 1: features = torch.cat((features, points), dim = 1)
             i += 1
-        sds = features[:, 0] # (B, 1)
-        return sds
+        return features
     
     def get_color(
         self,
