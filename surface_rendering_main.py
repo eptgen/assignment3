@@ -367,6 +367,7 @@ def train_images(
             out = model(ray_bundle)
 
             # Color loss
+            print(out)
             loss = torch.mean(torch.square(rgb_gt - out['color']))
             image_loss = loss
 
