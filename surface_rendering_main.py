@@ -426,7 +426,7 @@ def train_images(
                 )
                 i = 0
                 for im in test_images:
-                    imageio.imsave(f"images/part_7/part_7_{i}.png", im)
+                    imageio.imsave(f"images/part_7/part_7_{i}.png", np.uint8(im * 255))
                     i += 1
                 imageio.mimsave('images/part_7_geometry.gif', [np.uint8(im * 255) for im in test_images])
             except Exception as e:
