@@ -224,9 +224,9 @@ class SphereTracingRenderer(torch.nn.Module):
 
 def sdf_to_density(signed_distance, alpha, beta):
     def psi(s):
-        if s <= 0:
-            return 0.5 * torch.exp(s / beta)
-        return 1 - 0.5 * torch.exp(-s / beta)
+        leq_0 = 0.5 * torch.exp(s / beta)
+        g_0 = 1 - 0.5 * torch.exp(-s / beta)
+        return (s <= 0) * leq_0 + (s > 0) * g_0
     return alpha * psi(-signed_distance)
 
 class VolumeSDFRenderer(VolumeRenderer):
