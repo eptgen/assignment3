@@ -50,7 +50,7 @@ implicit_function:
 
   n_layers_distance: 6
   n_hidden_neurons_distance: 128
-  append_distance: []
+  append_distance: [3]
 
   n_layers_color: 2
   n_hidden_neurons_color: 128
