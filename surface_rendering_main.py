@@ -327,6 +327,7 @@ def train_images(
     # Create model
     model, optimizer, lr_scheduler, start_epoch, checkpoint_path = create_model(cfg)
     print(model)
+    current_config = "12"
 
     # Load the training/validation data.
     train_dataset, val_dataset, _ = get_nerf_datasets(
@@ -417,7 +418,7 @@ def train_images(
                 model, create_surround_cameras(4.0, n_poses=20, up=(0.0, 0.0, 1.0), focal_length=2.0),
                 cfg.data.image_size, file_prefix='volsdf'
             )
-            imageio.mimsave(f'images/part_7_{cfg.alpha}_{cfg.beta}.gif', [np.uint8(im * 255) for im in test_images])
+            imageio.mimsave(f'images/part_7_{current_config}.gif', [np.uint8(im * 255) for im in test_images])
 
             try:
                 test_images = render_geometry(
@@ -426,7 +427,7 @@ def train_images(
                 )
                 i = 0
                 for im in test_images:
-                    imageio.imsave(f"images/part_7_{cfg.alpha}_{cfg.beta}/part_7_{cfg.alpha}_{cfg.beta}_{i}.png", np.uint8(im * 255))
+                    imageio.imsave(f"images/part_7_{current_config}/part_7_{current_config}_{i}.png", np.uint8(im * 255))
                     i += 1
                 imageio.mimsave('images/part_7_geometry.gif', [np.uint8(im * 255) for im in test_images])
             except Exception as e:
