@@ -171,7 +171,7 @@ class SphereTracingRenderer(torch.nn.Module):
         mask = torch.ones(N, 1, dtype = torch.bool, device = "cuda") # (N, 1)
         while it < self.max_iters:
             dists = implicit_fn(points) # (N, 1)
-            print("shapes", dists.shape, directions.shape)
+            # print("shapes", dists.shape, directions.shape)
             points += directions * dists
             mask = torch.logical_and(mask, dists < self.far)
             it += 1
