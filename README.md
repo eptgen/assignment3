@@ -9,8 +9,10 @@ To train the NeRF, run the command `python volume_rendering_main.py --config-nam
 
 Part B.
 
-To render the torus, run the command `python -m surface_rendering_main --config-name=torus_surface`, and the images should appear as PNGs in the `images/part_5` directory.
+To render the torus, change the relevant variable in `surface_rendering_main.py` to `5` generate the files in the correct place, and run the command `python -m surface_rendering_main --config-name=torus_surface`, and the images should appear as PNGs in the `images/part_5` directory.
 
 To train the Neural SDF, run the command `python -m surface_rendering_main --config-name=points_surface`, and the images should appear as PNGs in the `images/part_6` directory.
 
 To train the Neural SDF that converts the SDF to density, run the command `python -m surface_rendering_main --config-name=volsdf_surface`. The GIF of the NeRF should appear in the `images` directory, and the frames of the geometry should appear as PNGs in the `images/part_7` directory.
+
+To render the smiley face, change the relevant variable in `surface_rendering_main.py` to `5` generate the files in the correct place, and run the command `python -m surface_rendering_main --config-name=smiley`, and the images should appear as PNGs in the `images/part_8` directory.
