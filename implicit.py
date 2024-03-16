@@ -208,7 +208,7 @@ class SDFSurface(torch.nn.Module):
         # Outputs
         if self.rainbow:
             base_color = torch.clamp(
-                torch.abs(points - self.sdf.center),
+                torch.abs(points),
                 0.02,
                 0.98
             )
