@@ -1,3 +1,6 @@
+
+import math
+
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -117,9 +120,16 @@ class SmileySDF(torch.nn.Module):
         
     def forward(self, points):
         sdfs = []
-        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([1.0, 0.0, 0.0], device = "cuda")))
-        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([-1.0, 0.0, 0.0], device = "cuda")))
-        sdfs.append(self.box(points, 0.25, torch.tensor([0.0, 2.0, 0.0], device = "cuda")))
+        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([1.0, -2.0, 0.0], device = "cuda")))
+        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([-1.0, -2.0, 0.0], device = "cuda")))
+        sdfs.append(self.box(points, 0.25, torch.tensor([0.0, 0.0, 0.0], device = "cuda")))
+        begin_theta = 30
+        end_theta = 150
+        num_boxes_smile = 18
+        radius = 1.5
+        for i in range(num_boxes_smile):
+            theta = end_theta + (end_theta - begin_theta) / (num_boxes_smile - 1) * i
+            sdfs.append(self.box(points, 0.25, torch.tensor([radius * math.cos(theta), radius * math.sin(theta), 0.0], device = "cuda")))
         return torch.min(torch.stack(sdfs, dim = 1), dim = 1, keepdim = False)[0]
 
 sdf_dict = {
