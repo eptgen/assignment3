@@ -12,3 +12,5 @@ Part B.
 To render the torus, run the command `python -m surface_rendering_main --config-name=torus_surface`, and the images should appear as PNGs in the `images/part_5` directory.
 
 To train the Neural SDF, run the command `python -m surface_rendering_main --config-name=points_surface`, and the images should appear as PNGs in the `images/part_6` directory.
+
+To train the Neural SDF that converts the SDF to density, run the command `python -m surface_rendering_main --config-name=volsdf_surface`. The GIF of the NeRF should appear in the `images` directory, and the frames of the geometry should appear as PNGs in the `images/part_7` directory.

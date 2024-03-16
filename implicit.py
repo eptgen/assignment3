@@ -84,10 +84,36 @@ class TorusSDF(torch.nn.Module):
         )
         return (torch.linalg.norm(q, dim=-1) - self.radii[..., 1]).unsqueeze(-1)
 
+# Smiley SDF class
+class SmileySDF(torch.nn.Module):
+    def __init__(
+        self,
+        cfg
+    ):
+        super().__init__()
+
+    def torus(self, points, r_outer, r_inner, center):
+        points = points.view(-1, 3)
+        diff = points - center
+        q = torch.stack(
+            [
+                torch.linalg.norm(diff[..., :2], dim=-1) - r_outer,
+                diff[..., -1],
+            ],
+            dim=-1
+        )
+        return (torch.linalg.norm(q, dim=-1) - r_inner).unsqueeze(-1)
+        
+    def forward(self, points):
+        sdfs = []
+        sdfs.append(self.torus(points, 1.0, 0.25, (0.0, 0.0, 0.0)))
+        return torch.min(torch.stack(sdfs, dim = 1), dim = 1)
+
 sdf_dict = {
     'sphere': SphereSDF,
     'box': BoxSDF,
     'torus': TorusSDF,
+    "smiley": SmileySDF,
 }
 
 
