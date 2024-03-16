@@ -128,7 +128,7 @@ class SmileySDF(torch.nn.Module):
         num_boxes_smile = 18
         radius = 1.5
         for i in range(num_boxes_smile):
-            theta = end_theta + (end_theta - begin_theta) / (num_boxes_smile - 1) * i
+            theta = begin_theta + (end_theta - begin_theta) / (num_boxes_smile - 1) * i
             sdfs.append(self.box(points, 0.25, torch.tensor([radius * math.cos(theta), radius * math.sin(theta), 0.0], device = "cuda")))
         return torch.min(torch.stack(sdfs, dim = 1), dim = 1, keepdim = False)[0]
 
