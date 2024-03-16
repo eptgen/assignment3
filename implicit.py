@@ -107,7 +107,7 @@ class SmileySDF(torch.nn.Module):
     def forward(self, points):
         sdfs = []
         sdfs.append(self.torus(points, 1.0, 0.25, torch.tensor([0.0, 0.0, 0.0], device = "cuda")))
-        return torch.min(torch.stack(sdfs, dim = 1), dim = 1, keepdim = True)[0]
+        return torch.min(torch.stack(sdfs, dim = 1), dim = 1, keepdim = False)[0]
 
 sdf_dict = {
     'sphere': SphereSDF,
