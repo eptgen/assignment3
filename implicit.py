@@ -104,10 +104,22 @@ class SmileySDF(torch.nn.Module):
         )
         return (torch.linalg.norm(q, dim=-1) - r_inner).unsqueeze(-1)
         
+    def box(self, points, side_lengths, center):
+        points = points.view(-1, 3)
+        diff = torch.abs(points - center) - side_lengths / 2.0
+
+        signed_distance = torch.linalg.norm(
+            torch.maximum(diff, torch.zeros_like(diff)),
+            dim=-1
+        ) + torch.minimum(torch.max(diff, dim=-1)[0], torch.zeros_like(diff[..., 0]))
+
+        return signed_distance.unsqueeze(-1)
+        
     def forward(self, points):
         sdfs = []
-        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([1.5, 0.0, 0.0], device = "cuda")))
-        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([-1.5, 0.0, 0.0], device = "cuda")))
+        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([1.0, 0.0, 0.0], device = "cuda")))
+        sdfs.append(self.torus(points, 0.5, 0.125, torch.tensor([-1.0, 0.0, 0.0], device = "cuda")))
+        sdfs.append(self.box(points, 0.25, torch.tensor([0.0, 0.5, 0.0], device = "cuda")))
         return torch.min(torch.stack(sdfs, dim = 1), dim = 1, keepdim = False)[0]
 
 sdf_dict = {
