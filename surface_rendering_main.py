@@ -149,7 +149,8 @@ def render(
     )
     i = 0
     for im in all_images:
-        imageio.imsave(f"images/part_5/part_5_{i}.png", np.uint8(im * 255))
+        part = 8 # CHANGE DEPENDING ON WHICH SURFACE YOU'RE RENDERING
+        imageio.imsave(f"images/part_{part}/part_{part}_{i}.png", np.uint8(im * 255))
         i += 1
     # imageio.mimsave('images/part_5.gif', [np.uint8(im * 255) for im in all_images])
 
