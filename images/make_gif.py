@@ -1,7 +1,7 @@
 import imageio
 
-NAME = "part_7_12"
-OUT_NAME = f"../../proj3/data/{NAME}_geometry.gif"
+NAME = "part_8"
+OUT_NAME = f"../../proj3/data/{NAME}.gif"
 NUM_FRAMES = 20
 FPS = 10
 
